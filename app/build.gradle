@@ -1,0 +1,78 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
+    }
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'android-apt'
+
+dependencies {
+    apt "org.androidannotations:androidannotations:3.2"
+    compile "org.androidannotations:androidannotations-api:3.2"
+    compile 'com.android.support:appcompat-v7:18.0.+'
+    compile 'com.android.support:support-v4:21.0.+'
+
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+}
+
+android {
+    compileOptions {
+        encoding "UTF-8"
+    }
+    compileSdkVersion 19
+    buildToolsVersion '23.0.2'
+
+    defaultConfig {
+        applicationId "com.manuelmaly.hn"
+        minSdkVersion 8
+        targetSdkVersion 19
+        versionCode 25
+        versionName "1.9.15"
+    }
+
+    signingConfigs {
+        def props = new Properties()
+        props.load(new FileInputStream(rootProject.file("release.properties")))
+
+        release {
+            storeFile new File(props.keyStore)
+            storePassword props.keyStorePassword
+            keyAlias props.keyAlias
+            keyPassword props.keyAliasPassword
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            applicationVariants.all { variant ->
+                variant.outputs.each { output ->
+                    def outputFile = output.outputFile
+                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                        def fileName = outputFile.name.replace('.apk', "-v${versionName}-b${versionCode}.apk")
+                        output.outputFile = new File(outputFile.parent, fileName)
+                    }
+                }
+            }
+
+        }
+
+        debug {
+
+        }
+    }
+}
+
+apt {
+    arguments {
+        // you might have to change this if the app has different variants and flavours
+        androidManifestFile variant.outputs[0].processResources.manifestFile
+        resourcePackageName android.defaultConfig.applicationId
+    }
+}
