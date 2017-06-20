@@ -6,6 +6,9 @@ import com.manuelmaly.hn.model.HNFeed;
 import com.manuelmaly.hn.model.HNPost;
 import com.manuelmaly.hn.util.HNHelper;
 
+import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -17,7 +20,7 @@ public class HNFeedParser extends BaseHTMLParser<HNFeed> {
     public HNFeed parseDocument(Element doc) throws Exception {
         if (doc == null)
             return new HNFeed();
-        
+
         String currentUser = Settings.getUserName(App.getInstance());
 
         ArrayList<HNPost> posts = new ArrayList<HNPost>();
@@ -59,11 +62,11 @@ public class HNFeedParser extends BaseHTMLParser<HNFeed> {
                         endParsing = true;
                         break;
                     }
-                    
+
                     title = e1.text();
                     url = HNHelper.resolveRelativeHNURL(e1.attr("href"));
                     urlDomain = getDomainName(url);
-                    
+
                     Element e4 = rowElement.select("tr > td:eq(1) a").first();
                     if (e4 != null) {
                         upvoteURL = e4.attr("href");
@@ -86,12 +89,12 @@ public class HNFeedParser extends BaseHTMLParser<HNFeed> {
                     else
                         commentsCount = BaseHTMLParser.UNDEFINED;
 
-                    posts.add(new HNPost(url, title, urlDomain, author, postID, commentsCount, points, upvoteURL));
+                    posts.add(new HNPost(url, title, urlDomain, author, postID, Integer.toString(commentsCount), Integer.toString(points), upvoteURL));
                     break;
                 default:
                     break;
             }
-            
+
             if (endParsing)
                 break;
         }

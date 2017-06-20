@@ -1,5 +1,7 @@
 package com.manuelmaly.hn.server;
 
+import com.manuelmaly.hn.model.HNPost;
+
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.HeaderIterator;
@@ -14,16 +16,16 @@ import java.io.IOException;
  * Handles HTML response of a request to login to HN and retrieving its user token.
  * @author manuelmaly
  */
-public class GetHNUserTokenResponseHandler implements ResponseHandler<String> {
+public class GetHNUserTokenResponseHandler implements ResponseHandler<HNPost> {
 
-    private IAPICommand<String> mCommand;
+    private IAPICommand<HNPost> mCommand;
     
-    public GetHNUserTokenResponseHandler(IAPICommand<String> command, HttpClient client) {
+    public GetHNUserTokenResponseHandler(IAPICommand<HNPost> command, HttpClient client) {
         mCommand = command;
     }
     
     @Override
-    public String handleResponse(HttpResponse response)
+    public HNPost handleResponse(HttpResponse response)
             throws ClientProtocolException, IOException {
     	String responseString = null;
     	String redirectToLocation = null;
@@ -40,8 +42,8 @@ public class GetHNUserTokenResponseHandler implements ResponseHandler<String> {
         	responseString = getUserID(response);
         }
         
-        mCommand.responseHandlingFinished(responseString, response.getStatusLine().getStatusCode());
-        return responseString;
+        //mCommand.responseHandlingFinished(responseString, response.getStatusLine().getStatusCode());
+        return null;
     }
     
     private String getUserID(HttpResponse response) {

@@ -24,7 +24,8 @@ public class HNFeedTaskMainFeed extends HNFeedTaskBase {
     
     @Override
     protected String getFeedURL() {
-        return "https://news.ycombinator.com/";
+        return "http://192.168.2.89:3000";
+        //return "https://news.ycombinator.com/";
     }
     
     public static void startOrReattach(Activity activity, ITaskFinishedHandler<HNFeed> finishedHandler, int taskCode) {

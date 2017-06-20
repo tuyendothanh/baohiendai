@@ -1,11 +1,20 @@
 package com.manuelmaly.hn.parser;
 
+import com.manuelmaly.hn.App;
+import com.manuelmaly.hn.Settings;
+import com.manuelmaly.hn.model.HNFeed;
+import com.manuelmaly.hn.model.HNPost;
+import com.manuelmaly.hn.util.HNHelper;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.TextNode;
+import org.jsoup.select.Elements;
 import org.w3c.dom.Node;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -16,6 +25,39 @@ public abstract class BaseHTMLParser<T> {
 
     public T parse(String input) throws Exception {
       return parseDocument(Jsoup.parse(input));
+    }
+
+    public HNFeed parseHNPost(List<HNPost> input) throws Exception {
+        if (input == null)
+            return new HNFeed();
+
+        ArrayList<HNPost> posts = new ArrayList<HNPost>();
+
+        String nextPageURL = null;
+
+        String url = null;
+        String title = null;
+        String author = null;
+        int commentsCount = 0;
+        int points = 0;
+        String urlDomain = null;
+        String postID = null;
+        String upvoteURL = null;
+
+        boolean endParsing = false;
+        for (int row = 0; row < input.size(); row++) {
+            posts.add(new HNPost(input.get(row).getURL(),
+                    input.get(row).getTitle(),
+                    input.get(row).getURLDomain(),
+                    input.get(row).getAuthor(),
+                    input.get(row).getPostID(),
+                    input.get(row).getCommentsCount(),
+                    input.get(row).getPoints(),
+                    input.get(row).getURL()));
+        }
+
+        return new HNFeed(posts, nextPageURL, Settings
+                .getUserName(App.getInstance()));
     }
 
     public abstract T parseDocument(Element doc) throws Exception;

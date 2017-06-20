@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.content.LocalBroadcastManager;
 
+import com.manuelmaly.hn.model.HNFeed;
+import com.manuelmaly.hn.model.HNPost;
+
 import org.apache.http.Header;
 import org.apache.http.HeaderIterator;
 import org.apache.http.client.CookieStore;
@@ -24,7 +27,16 @@ import org.apache.http.params.HttpParams;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.GET;
+import retrofit2.http.Path;
 
 /**
  * Generic base for HTTP calls via {@link HttpClient}, ideally to be started in
@@ -50,6 +62,7 @@ public abstract class BaseHTTPCommand<T extends Serializable> implements IAPICom
     private Context mApplicationContext;
     private int mErrorCode;
     private T mResponse;
+    private List<T> mListResponse;
     private Object mTag;
     private int mSocketTimeoutMS;
     private int mHttpTimeoutMS;
@@ -108,11 +121,42 @@ public abstract class BaseHTTPCommand<T extends Serializable> implements IAPICom
             modifyHttpClient(httpclient);
             mRequest = createRequest();
 
-            httpclient.execute(setRequestData(mRequest), getResponseHandler(httpclient));
+            // Khởi tạo Retrofit để gán API ENDPOINT (Domain URL) cho Retrofit 2.0
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(mUrl)
+                    // Sử dụng GSON cho việc parse và maps JSON data tới Object
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+
+            // Khởi tạo các cuộc gọi cho Retrofit 2.0
+            HNFeedService hnFeedService = retrofit.create(HNFeedService.class);
+
+            Call<List<HNPost>> call = hnFeedService.listHNFeed(0);
+            // Cuộc gọi bất đồng bọ (chạy dưới background)
+            //call.enqueue(getRetrofitResponseHandler());
+
+            Response<List<HNPost>> newPostResponse = call.execute();
+
+            // Here call newPostResponse.code() to get response code
+            int statusCode = newPostResponse.code();
+            if(statusCode == 200) {
+                List<HNPost> newPost = newPostResponse.body();
+                responseListHandlingFinished((List<T>) newPost, statusCode);
+            }
+            else if(statusCode == 401) {
+
+            }
+
+            //httpclient.execute(setRequestData(mRequest), getResponseHandler(httpclient));
         } catch (Exception e) {
             setErrorCode(ERROR_GENERIC_COMMUNICATION_ERROR);
             onFinished();
         }
+    }
+
+    public interface HNFeedService {
+        @GET("/articlesdemo/{index}")
+        Call<List<HNPost>> listHNFeed(@Path("index") int index);
     }
 
     /**
@@ -191,8 +235,26 @@ public abstract class BaseHTTPCommand<T extends Serializable> implements IAPICom
     }
 
     @Override
+    public void responseListHandlingFinished(List<T> parsedResponse, int responseHttpStatus) {
+        mActualStatusCode = responseHttpStatus;
+        mListResponse = parsedResponse;
+        if (mActualStatusCode < 200 || mActualStatusCode >= 400)
+            setErrorCode(ERROR_SERVER_RETURNED_ERROR);
+        else if (mListResponse == null)
+            setErrorCode(ERROR_RESPONSE_PARSE_ERROR);
+        else
+            setErrorCode(ERROR_NONE);
+        onFinished();
+    }
+
+    @Override
     public T getResponseContent() {
         return mResponse;
+    }
+
+    @Override
+    public List<T> getListResponseContent() {
+        return mListResponse;
     }
 
     protected void setErrorCode(int errorCode) {
@@ -227,6 +289,8 @@ public abstract class BaseHTTPCommand<T extends Serializable> implements IAPICom
     abstract protected HttpUriRequest setRequestData(HttpUriRequest request);
 
     abstract protected ResponseHandler<T> getResponseHandler(HttpClient client);
+
+    abstract protected Callback<List<HNPost>> getRetrofitResponseHandler();
 
     public void setCookieStore(CookieStore cookieStore) {
         mCookieStore = cookieStore;

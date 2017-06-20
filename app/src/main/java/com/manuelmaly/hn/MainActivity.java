@@ -1,5 +1,9 @@
 package com.manuelmaly.hn;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.manuelmaly.hn.model.HNFeed;
 import com.manuelmaly.hn.model.HNPost;
 import com.manuelmaly.hn.parser.BaseHTMLParser;
@@ -16,6 +20,7 @@ import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.ViewById;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -117,6 +122,8 @@ public class MainActivity extends BaseListActivity implements
         TextView tv = (TextView) getSupportActionBar().getCustomView()
                 .findViewById(R.id.actionbar_title);
         tv.setTypeface(FontHelper.getComfortaa(this, true));
+
+
     }
 
     @AfterViews
@@ -471,7 +478,7 @@ public class MainActivity extends BaseListActivity implements
                 holder.urlView.setText(item.getURLDomain());
                 holder.pointsView.setTextSize(TypedValue.COMPLEX_UNIT_DIP,
                         mFontSizeDetails);
-                if (item.getPoints() != BaseHTMLParser.UNDEFINED) {
+                if (item.getPoints() != Integer.toString(BaseHTMLParser.UNDEFINED)) {
                     holder.pointsView.setText(item.getPoints() + "");
                 } else {
                     holder.pointsView.setText("-");
@@ -479,7 +486,7 @@ public class MainActivity extends BaseListActivity implements
 
                 holder.commentsButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP,
                         mFontSizeTitle);
-                if (item.getCommentsCount() != BaseHTMLParser.UNDEFINED) {
+                if (item.getCommentsCount() != Integer.toString(BaseHTMLParser.UNDEFINED)) {
                     holder.commentsButton.setVisibility(View.VISIBLE);
                     holder.commentsButton.setText(item.getCommentsCount() + "");
                 } else {

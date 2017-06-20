@@ -1,5 +1,7 @@
 package com.manuelmaly.hn.server;
 
+import java.util.List;
+
 /**
  * Interface for HTTP request commands (command pattern).
  * 
@@ -35,6 +37,8 @@ public interface IAPICommand<T> extends Runnable {
      */
     public T getResponseContent();
 
+    public List<T> getListResponseContent();
+
     /**
      * Returns the error code which occurred. If a high-level error occurred
      * which has nothing to do with technical issues (e.g. validation error),
@@ -52,6 +56,8 @@ public interface IAPICommand<T> extends Runnable {
     public int getActualStatusCode();
 
     public void responseHandlingFinished(T parsedResponse, int responseHttpStatus);
+
+    public void responseListHandlingFinished(List<T> parsedResponse, int responseHttpStatus);
     
     public enum RequestType {
         GET, PUT, POST, DELETE

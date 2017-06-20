@@ -12,13 +12,17 @@ import org.apache.http.message.BasicNameValuePair;
 
 import android.content.Context;
 
+import com.manuelmaly.hn.model.HNPost;
+
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class GetHNUserTokenHTTPCommand extends BaseHTTPCommand<String> {
+import retrofit2.Callback;
+
+public class GetHNUserTokenHTTPCommand extends BaseHTTPCommand<HNPost> {
 
   public GetHNUserTokenHTTPCommand(String url, HashMap<String, String> queryParams, RequestType type, boolean notifyFinishedBroadcast,
       String notificationBroadcastIntentID, Context applicationContext, Map<String, String> body) {
@@ -53,8 +57,17 @@ public class GetHNUserTokenHTTPCommand extends BaseHTTPCommand<String> {
   }
 
   @Override
-  protected ResponseHandler<String> getResponseHandler(HttpClient client) {
+  protected ResponseHandler<HNPost> getResponseHandler(HttpClient client) {
     return new GetHNUserTokenResponseHandler(this, client);
   }
 
+  @Override
+  protected Callback<List<HNPost>> getRetrofitResponseHandler() {
+    return null;
+  }
+
+  @Override
+  public void responseListHandlingFinished(List<HNPost> parsedResponse, int responseHttpStatus) {
+    ;
+  }
 }

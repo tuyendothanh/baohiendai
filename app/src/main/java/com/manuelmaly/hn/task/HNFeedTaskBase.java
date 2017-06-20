@@ -38,8 +38,13 @@ public abstract class HNFeedTaskBase extends BaseTask<HNFeed> {
         public void run() {
             mFeedDownload = new StringDownloadCommand(getFeedURL(), new HashMap<String, String>(), RequestType.GET, false, null,
                 App.getInstance(), HNCredentials.getCookieStore(App.getInstance()));
-            
+
             mFeedDownload.run();
+//            try {
+//                ;//Thread.sleep(5000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
 
             if (mCancelled)
                 mErrorCode = IAPICommand.ERROR_CANCELLED_BY_USER;
@@ -49,7 +54,7 @@ public abstract class HNFeedTaskBase extends BaseTask<HNFeed> {
             if (!mCancelled && mErrorCode == IAPICommand.ERROR_NONE) {
                 HNFeedParser feedParser = new HNFeedParser();
                 try {
-                    mResult = feedParser.parse(mFeedDownload.getResponseContent());
+                    mResult = feedParser.parseHNPost(mFeedDownload.getListResponseContent());
                     Run.inBackground(new Runnable() {
                         public void run() {
                             FileUtil.setLastHNFeed(mResult);

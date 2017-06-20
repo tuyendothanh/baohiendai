@@ -93,7 +93,7 @@ public class HNLoginTask extends BaseTask<Boolean> {
             if (!mCancelled && mErrorCode == IAPICommand.ERROR_NONE) {
                 HNNewsLoginParser loginParser = new HNNewsLoginParser();
                 try {
-                    return loginParser.parse(newsLoginDownload.getResponseContent());
+                    return "";//loginParser.parse(newsLoginDownload.getResponseContent());
                 } catch (Exception e) {
                     Log.e("HNFeedTask", "Login Page Parser Error :(", e);
                     ExceptionUtil.sendToGoogleAnalytics(e, Const.GAN_ACTION_PARSING);
@@ -119,7 +119,7 @@ public class HNLoginTask extends BaseTask<Boolean> {
                 mErrorCode = getUserTokenCommand.getErrorCode();
 
             if (!mCancelled && mErrorCode == IAPICommand.ERROR_NONE) {
-                return getUserTokenCommand.getResponseContent();
+                return null;//getUserTokenCommand.getResponseContent();
             }
             return null;
         }

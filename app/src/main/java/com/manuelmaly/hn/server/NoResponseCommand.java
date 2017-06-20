@@ -24,7 +24,7 @@ public abstract class NoResponseCommand extends BaseHTTPCommand<Boolean> {
 
     @Override
     protected HttpUriRequest setRequestData(HttpUriRequest request) {
-        request.setHeader(ACCEPT_HEADER, HTML_MIME);
+        request.setHeader(ACCEPT_HEADER, JSON_MIME);
         return request;
     }
 

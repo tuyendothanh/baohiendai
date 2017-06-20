@@ -87,12 +87,12 @@ public class HNPostCommentsTask extends BaseTask<HNPostComments> {
             if (!mCancelled && mErrorCode == IAPICommand.ERROR_NONE) {
                 HNCommentsParser commentsParser = new HNCommentsParser();
                 try {
-                    mResult = commentsParser.parse(mFeedDownload.getResponseContent());
-                    Run.inBackground(new Runnable() {
-                        public void run() {
-                            FileUtil.setLastHNPostComments(mResult, mPostID);
-                        }
-                    });
+//                    mResult = commentsParser.parse(mFeedDownload.getResponseContent());
+//                    Run.inBackground(new Runnable() {
+//                        public void run() {
+//                            FileUtil.setLastHNPostComments(mResult, mPostID);
+//                        }
+//                    });
                 } catch (Exception e) {
                     ExceptionUtil.sendToGoogleAnalytics(e, Const.GAN_ACTION_PARSING);
                     Log.e("HNFeedTask", "Parse error!", e);
