@@ -40,11 +40,6 @@ public abstract class HNFeedTaskBase extends BaseTask<HNFeed> {
                 App.getInstance(), HNCredentials.getCookieStore(App.getInstance()));
 
             mFeedDownload.run();
-//            try {
-//                ;//Thread.sleep(5000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
 
             if (mCancelled)
                 mErrorCode = IAPICommand.ERROR_CANCELLED_BY_USER;

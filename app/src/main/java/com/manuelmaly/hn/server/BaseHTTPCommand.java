@@ -162,7 +162,7 @@ public abstract class BaseHTTPCommand<T extends Serializable> implements IAPICom
     /**
      * Override this to make changes to the HTTP client before it executes the
      * request.
-     * 
+     *
      * @param client
      */
     protected void modifyHttpClient(DefaultHttpClient client) {
@@ -202,7 +202,7 @@ public abstract class BaseHTTPCommand<T extends Serializable> implements IAPICom
 
     /**
      * Create a request object according to the request type set.
-     * 
+     *
      * @return HttpRequestBase request object.
      */
     protected HttpRequestBase createRequest() {
@@ -283,7 +283,7 @@ public abstract class BaseHTTPCommand<T extends Serializable> implements IAPICom
 
     /**
      * Update the given request before it is sent over the wire.
-     * 
+     *
      * @param request
      */
     abstract protected HttpUriRequest setRequestData(HttpUriRequest request);

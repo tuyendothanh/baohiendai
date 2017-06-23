@@ -1,8 +1,40 @@
 package com.manuelmaly.hn;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.database.DataSetObserver;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Parcelable;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
+import android.util.Log;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.manuelmaly.hn.model.HNFeed;
 import com.manuelmaly.hn.model.HNPost;
@@ -20,42 +52,7 @@ import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.ViewById;
-import org.json.JSONObject;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.database.DataSetObserver;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.Parcelable;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
-import android.util.TypedValue;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
-import android.view.ViewConfiguration;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -101,10 +98,15 @@ public class MainActivity extends BaseListActivity implements
 
     boolean mShouldShowRefreshing = false;
 
+    private ViewPager mPager;
+
+    ActionBar mActionbar;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setContentView(R.layout.main);
+/*
         // Make sure that we show the overflow menu icon
         try {
             ViewConfiguration config = ViewConfiguration.get(this);
@@ -122,8 +124,75 @@ public class MainActivity extends BaseListActivity implements
         TextView tv = (TextView) getSupportActionBar().getCustomView()
                 .findViewById(R.id.actionbar_title);
         tv.setTypeface(FontHelper.getComfortaa(this, true));
+*/
+        /** Getting a reference to action bar of this activity */
+        mActionbar = getSupportActionBar();
 
+        /** Set tab navigation mode */
+        mActionbar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
+        /** Getting a reference to ViewPager from the layout */
+        mPager = (ViewPager) findViewById(R.id.pager);
+
+        /** Getting a reference to FragmentManager */
+        FragmentManager fm = getSupportFragmentManager();
+
+        /** Defining a listener for pageChange */
+        ViewPager.SimpleOnPageChangeListener pageChangeListener = new ViewPager.SimpleOnPageChangeListener(){
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                mActionbar.setSelectedNavigationItem(position);
+            }
+
+        };
+
+        /** Setting the pageChange listener to the viewPager */
+        mPager.setOnPageChangeListener(pageChangeListener);
+
+        /** Creating an instance of FragmentPagerAdapter */
+        MainFragmentPagerAdapter fragmentPagerAdapter = new MainFragmentPagerAdapter(fm);
+
+        /** Setting the FragmentPagerAdapter object to the viewPager object */
+        mPager.setAdapter(fragmentPagerAdapter);
+
+        mActionbar.setDisplayShowTitleEnabled(false);
+        mActionbar.setDisplayUseLogoEnabled(false);
+        mActionbar.setDisplayShowHomeEnabled(false);
+
+        /** Defining tab listener */
+        ActionBar.TabListener tabListener = new ActionBar.TabListener() {
+
+            @Override
+            public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+                mPager.setCurrentItem(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+
+            }
+
+            @Override
+            public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+
+            }
+
+        };
+
+        /** Creating fragment1 Tab */
+        ActionBar.Tab tab = mActionbar.newTab()
+                .setText("Tab1")
+                .setTabListener(tabListener);
+
+        mActionbar.addTab(tab);
+
+        /** Creating fragment2 Tab */
+        tab = mActionbar.newTab()
+                .setText("Tab2")
+                .setTabListener(tabListener);
+
+        mActionbar.addTab(tab);
     }
 
     @AfterViews

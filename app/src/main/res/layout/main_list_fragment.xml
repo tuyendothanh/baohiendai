@@ -1,18 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:contentDescription="@string/more"
-    android:orientation="vertical"
-    tools:context="com.manuelmaly.hn.MainActivity">
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/pager"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
+    tools:context="com.manuelmaly.hn.MainListFragment">
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/main_swiperefreshlayout"
@@ -41,5 +32,5 @@
         android:textColor="#c3b5a7"
         android:textSize="26sp" >
     </TextView>
-    </android.support.v4.view.ViewPager>
-</LinearLayout>
+
+</FrameLayout>
