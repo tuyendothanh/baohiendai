@@ -98,14 +98,15 @@ public class MainActivity extends BaseListActivity implements
 
     boolean mShouldShowRefreshing = false;
 
-    private ViewPager mPager;
+    @ViewById(R.id.pager)
+    ViewPager mPager;
 
     ActionBar mActionbar;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        //setContentView(R.layout.main);
 /*
         // Make sure that we show the overflow menu icon
         try {
@@ -125,6 +126,23 @@ public class MainActivity extends BaseListActivity implements
                 .findViewById(R.id.actionbar_title);
         tv.setTypeface(FontHelper.getComfortaa(this, true));
 */
+    }
+
+    @AfterViews
+    public void init() {
+        mFeed = new HNFeed(new ArrayList<HNPost>(), null, "");
+        mPostsListAdapter = new PostsAdapter();
+        mUpvotedPosts = new HashSet<HNPost>();
+
+        mEmptyListPlaceholder = getEmptyTextView(mRootView);
+        mPostsList.setEmptyView(mEmptyListPlaceholder);
+        mPostsList.setAdapter(mPostsListAdapter);
+
+        mEmptyListPlaceholder.setTypeface(FontHelper.getComfortaa(this, true));
+
+        mTitleColor = getResources().getColor(R.color.dark_gray_post_title);
+        mTitleReadColor = getResources().getColor(R.color.gray_post_title_read);
+
         /** Getting a reference to action bar of this activity */
         mActionbar = getSupportActionBar();
 
@@ -132,7 +150,7 @@ public class MainActivity extends BaseListActivity implements
         mActionbar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         /** Getting a reference to ViewPager from the layout */
-        mPager = (ViewPager) findViewById(R.id.pager);
+        //mPager = (ViewPager) findViewById(R.id.pager);
 
         /** Getting a reference to FragmentManager */
         FragmentManager fm = getSupportFragmentManager();
@@ -193,22 +211,6 @@ public class MainActivity extends BaseListActivity implements
                 .setTabListener(tabListener);
 
         mActionbar.addTab(tab);
-    }
-
-    @AfterViews
-    public void init() {
-        mFeed = new HNFeed(new ArrayList<HNPost>(), null, "");
-        mPostsListAdapter = new PostsAdapter();
-        mUpvotedPosts = new HashSet<HNPost>();
-
-        mEmptyListPlaceholder = getEmptyTextView(mRootView);
-        mPostsList.setEmptyView(mEmptyListPlaceholder);
-        mPostsList.setAdapter(mPostsListAdapter);
-
-        mEmptyListPlaceholder.setTypeface(FontHelper.getComfortaa(this, true));
-
-        mTitleColor = getResources().getColor(R.color.dark_gray_post_title);
-        mTitleReadColor = getResources().getColor(R.color.gray_post_title_read);
 
         toggleSwipeRefreshLayout();
 
