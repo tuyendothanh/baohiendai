@@ -40,7 +40,7 @@
         android:layout_height="fill_parent"
         android:background="@color/peach"
         android:gravity="center"
-        android:text="@string/loading"
+        android:text="Main loading..."
         android:textColor="#c3b5a7"
         android:textSize="26sp" >
     </TextView>
