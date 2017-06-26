@@ -29,9 +29,16 @@ public class CategoryListModel {
     public static class CategoryData implements Serializable {
         private static final long serialVersionUID = 6789758363164898276L;
         private String description;
-        private int _id;
+        private String _id;
         private String name;
         private String src;
+
+        public CategoryData(String description, String _id, String name, String src) {
+            this.description = description;
+            this._id = _id;
+            this.name = name;
+            this.src = src;
+        }
 
         public String getDescription() {
             return description;
@@ -41,11 +48,11 @@ public class CategoryListModel {
             this.description = description;
         }
 
-        public int getId() {
+        public String getId() {
             return _id;
         }
 
-        public void setId(int id) {
+        public void setId(String id) {
             this._id = id;
         }
 

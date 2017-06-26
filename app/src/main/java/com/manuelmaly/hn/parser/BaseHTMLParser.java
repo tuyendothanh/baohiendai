@@ -4,12 +4,10 @@ import com.manuelmaly.hn.App;
 import com.manuelmaly.hn.Settings;
 import com.manuelmaly.hn.model.HNFeed;
 import com.manuelmaly.hn.model.HNPost;
-import com.manuelmaly.hn.util.HNHelper;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.TextNode;
-import org.jsoup.select.Elements;
 import org.w3c.dom.Node;
 
 import java.net.URI;
@@ -56,7 +54,7 @@ public abstract class BaseHTMLParser<T> {
                     input.get(row).getURL()));
         }
 
-        return new HNFeed(posts, nextPageURL, Settings
+        return new HNFeed(input, nextPageURL, Settings
                 .getUserName(App.getInstance()));
     }
 

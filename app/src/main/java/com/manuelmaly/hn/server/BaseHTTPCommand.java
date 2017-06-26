@@ -5,11 +5,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.content.LocalBroadcastManager;
 
-import com.manuelmaly.hn.model.HNFeed;
 import com.manuelmaly.hn.model.HNPost;
 
-import org.apache.http.Header;
-import org.apache.http.HeaderIterator;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -131,7 +128,7 @@ public abstract class BaseHTTPCommand<T extends Serializable> implements IAPICom
             // Khởi tạo các cuộc gọi cho Retrofit 2.0
             HNFeedService hnFeedService = retrofit.create(HNFeedService.class);
 
-            Call<List<HNPost>> call = hnFeedService.listAllHNFeed();
+            Call<List<HNPost>> call = hnFeedService.listHNFeed(0); // hnFeedService.listAllHNFeed();
             // Cuộc gọi bất đồng bọ (chạy dưới background)
             //call.enqueue(getRetrofitResponseHandler());
 

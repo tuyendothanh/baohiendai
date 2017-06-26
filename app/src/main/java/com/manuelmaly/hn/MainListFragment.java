@@ -12,7 +12,6 @@ import android.database.DataSetObserver;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
@@ -24,7 +23,6 @@ import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -64,7 +62,7 @@ public class MainListFragment extends BaseListFragment implements
     ListView mPostsList;
 
     @ViewById(R.id.main_root)
-    FrameLayout mRootView;
+    LinearLayout mRootView;
 
     @ViewById(R.id.main_swiperefreshlayout)
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -93,9 +91,6 @@ public class MainListFragment extends BaseListFragment implements
     private Parcelable mListState = null;
 
     boolean mShouldShowRefreshing = false;
-
-    @ViewById(R.id.pager)
-    ViewPager mPager;
 
     ActionBar mActionbar;
 

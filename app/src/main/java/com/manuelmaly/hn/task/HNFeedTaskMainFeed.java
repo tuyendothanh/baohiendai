@@ -25,7 +25,8 @@ public class HNFeedTaskMainFeed extends HNFeedTaskBase {
     
     @Override
     protected String getFeedURL() {
-        return "http://192.168.1.3:3000";
+        return "http://192.168.2.89:3000";
+        //return "http://192.168.1.3:3000";
         //return "https://news.ycombinator.com/";
     }
     

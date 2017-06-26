@@ -3,13 +3,15 @@ package com.manuelmaly.hn.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.manuelmaly.hn.App;
 import com.manuelmaly.hn.CategoriesFragment;
 import com.manuelmaly.hn.R;
 import com.manuelmaly.hn.model.CategoryListModel;
@@ -40,7 +42,26 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        //ViewGroup.LayoutParams lp = holder.ivBg.getLayoutParams();
+        ViewGroup.LayoutParams lp = holder.ivBg.getLayoutParams();
+
+        final float scale = mContext.getResources().getDisplayMetrics().density;
+        int dp2pxw = (int) (12 * scale + 0.5f);
+        int dp2pxh = (int) (120 * scale + 0.5f);
+        WindowManager windowManager = (WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE);
+        DisplayMetrics dm = new DisplayMetrics();
+        Display display = windowManager.getDefaultDisplay();
+        display.getMetrics(dm);
+        float DIMEN_RATE = dm.density / 1.0F;
+        int DIMEN_DPI = dm.densityDpi;
+        int SCREEN_WIDTH = dm.widthPixels;
+        int SCREEN_HEIGHT = dm.heightPixels;
+        if(SCREEN_WIDTH > SCREEN_HEIGHT) {
+            int t = SCREEN_HEIGHT;
+            SCREEN_HEIGHT = SCREEN_WIDTH;
+            SCREEN_WIDTH = t;
+        }
+        lp.width = (SCREEN_WIDTH - dp2pxw) / 2;
+        lp.height = dp2pxh;
         //lp.width = (App.SCREEN_WIDTH - SystemUtil.dp2px(mContext,12)) / 2;
         //lp.height = SystemUtil.dp2px(mContext,120);
 

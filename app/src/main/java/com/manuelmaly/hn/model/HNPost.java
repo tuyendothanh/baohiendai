@@ -68,6 +68,14 @@ public class HNPost implements Serializable {
         return "src";
     }
 
+    public String getContent() {
+        return content;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
     public String getUpvoteURL(String currentUserName) {
         if (desc == null || !desc.contains("auth=")) // HN changed authentication
             return null;
