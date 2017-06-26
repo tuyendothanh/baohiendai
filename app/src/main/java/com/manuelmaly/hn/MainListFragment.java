@@ -24,6 +24,7 @@ import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -63,7 +64,7 @@ public class MainListFragment extends BaseListFragment implements
     ListView mPostsList;
 
     @ViewById(R.id.main_root)
-    LinearLayout mRootView;
+    FrameLayout mRootView;
 
     @ViewById(R.id.main_swiperefreshlayout)
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -98,33 +99,33 @@ public class MainListFragment extends BaseListFragment implements
 
     ActionBar mActionbar;
 
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                             Bundle savedInstanceState) {
-//        super.onCreateView(inflater, container, savedInstanceState);
-//
-//        /*
-//        // Make sure that we show the overflow menu icon
-//        try {
-//            ViewConfiguration config = ViewConfiguration.get(this);
-//            Field menuKeyField = ViewConfiguration.class
-//                    .getDeclaredField("sHasPermanentMenuKey");
-//
-//            if (menuKeyField != null) {
-//                menuKeyField.setAccessible(true);
-//                menuKeyField.setBoolean(config, false);
-//            }
-//        } catch (Exception e) {
-//            // presumably, not relevant
-//        }
-//
-//        TextView tv = (TextView) getSupportActionBar().getCustomView()
-//                .findViewById(R.id.actionbar_title);
-//        tv.setTypeface(FontHelper.getComfortaa(this, true));
-//*/
-//        inflater.inflate(R.layout.main_list_fragment, null, false);
-//        return null;//inflater.inflate(R.layout.main_list_fragment, null);
-//    }
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
+
+        /*
+        // Make sure that we show the overflow menu icon
+        try {
+            ViewConfiguration config = ViewConfiguration.get(this);
+            Field menuKeyField = ViewConfiguration.class
+                    .getDeclaredField("sHasPermanentMenuKey");
+
+            if (menuKeyField != null) {
+                menuKeyField.setAccessible(true);
+                menuKeyField.setBoolean(config, false);
+            }
+        } catch (Exception e) {
+            // presumably, not relevant
+        }
+
+        TextView tv = (TextView) getSupportActionBar().getCustomView()
+                .findViewById(R.id.actionbar_title);
+        tv.setTypeface(FontHelper.getComfortaa(this, true));
+*/
+        //inflater.inflate(R.layout.main_list_fragment, null, false);
+        return inflater.inflate(R.layout.main_list_fragment, null);
+    }
 
     @AfterViews
     public void init() {
@@ -140,6 +141,15 @@ public class MainListFragment extends BaseListFragment implements
 
         mTitleColor = getResources().getColor(R.color.dark_gray_post_title);
         mTitleReadColor = getResources().getColor(R.color.gray_post_title_read);
+
+        toggleSwipeRefreshLayout();
+
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                startFeedLoading();
+            }
+        });
 
         loadAlreadyReadCache();
         loadIntermediateFeedFromStore();
@@ -285,7 +295,7 @@ public class MainListFragment extends BaseListFragment implements
 
     private void startFeedLoading() {
         setShowRefreshing(true);
-        HNFeedTaskMainFeed.startOrReattach(getActivity(), this, TASKCODE_LOAD_FEED);
+        HNFeedTaskMainFeed.startOrReattach(this, this, TASKCODE_LOAD_FEED);
     }
 
     private boolean refreshFontSizes() {
@@ -312,6 +322,14 @@ public class MainListFragment extends BaseListFragment implements
     private void vote(String voteURL, HNPost post) {
         HNVoteTask.start(voteURL, getActivity(),
                 new VoteTaskFinishedHandler(), TASKCODE_VOTE, post);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle state) {
+        super.onActivityCreated(state);
+        if (state != null) {
+            mListState = state.getParcelable(LIST_STATE);
+        }
     }
 
     @Override

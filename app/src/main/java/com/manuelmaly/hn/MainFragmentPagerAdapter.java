@@ -27,12 +27,12 @@ public class MainFragmentPagerAdapter extends FragmentPagerAdapter {
 
             /** tab1 is selected */
             case 0:
-                MainListFragment mainListFragment = new MainListFragment();
+                MainListFragment_ mainListFragment = new MainListFragment_();
                 return mainListFragment;
 
             /** tab2 is selected */
             case 1:
-                CategoriesFragment categoriesFragment = new CategoriesFragment();
+                CategoriesFragment_ categoriesFragment = new CategoriesFragment_();
                 return categoriesFragment;
 
         }

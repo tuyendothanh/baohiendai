@@ -131,7 +131,7 @@ public abstract class BaseHTTPCommand<T extends Serializable> implements IAPICom
             // Khởi tạo các cuộc gọi cho Retrofit 2.0
             HNFeedService hnFeedService = retrofit.create(HNFeedService.class);
 
-            Call<List<HNPost>> call = hnFeedService.listHNFeed(0);
+            Call<List<HNPost>> call = hnFeedService.listAllHNFeed();
             // Cuộc gọi bất đồng bọ (chạy dưới background)
             //call.enqueue(getRetrofitResponseHandler());
 
@@ -155,8 +155,11 @@ public abstract class BaseHTTPCommand<T extends Serializable> implements IAPICom
     }
 
     public interface HNFeedService {
-        @GET("/articlesdemo/{index}")
+        @GET("/api/articlesdemo/{index}")
         Call<List<HNPost>> listHNFeed(@Path("index") int index);
+
+        @GET("/api/articlesdemo")
+        Call<List<HNPost>> listAllHNFeed();
     }
 
     /**

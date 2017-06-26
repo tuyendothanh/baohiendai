@@ -7,6 +7,9 @@ import android.widget.TextView;
 
 import com.manuelmaly.hn.util.FontHelper;
 
+import org.androidannotations.annotations.EFragment;
+
+@EFragment
 public class BaseListFragment extends Fragment {
 
     private TextView mLoadingView;
