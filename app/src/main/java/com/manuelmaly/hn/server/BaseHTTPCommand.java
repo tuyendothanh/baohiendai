@@ -60,6 +60,7 @@ public abstract class BaseHTTPCommand<T extends Serializable> implements IAPICom
     private int mErrorCode;
     private T mResponse;
     private List<T> mListResponse;
+    private int mCurrentpage;
     private Object mTag;
     private int mSocketTimeoutMS;
     private int mHttpTimeoutMS;
@@ -68,9 +69,36 @@ public abstract class BaseHTTPCommand<T extends Serializable> implements IAPICom
     private CookieStore mCookieStore;
 
     public BaseHTTPCommand(final String url, final HashMap<String, String> params, RequestType type,
+                           boolean notifyFinishedBroadcast, String notificationBroadcastIntentID, Context applicationContext,
+                           int socketTimeoutMS, int httpTimeoutMS, Map<String, String> body) {
+        mUrl = url;
+        mCurrentpage = 0;
+        mBody = body;
+
+        if (params != null) {
+            StringBuilder sb = new StringBuilder();
+            for (String param : params.keySet()) {
+                if (sb.length() > 0)
+                    sb.append("&");
+                sb.append(Uri.encode(param)).append("=").append(Uri.encode(params.get(param)));
+            }
+            mURLQueryParams = sb.toString();
+        }
+
+        mType = type;
+        mNotificationBroadcastIntentID = notificationBroadcastIntentID == null ? DEFAULT_BROADCAST_INTENT_ID
+                : notificationBroadcastIntentID;
+        mApplicationContext = applicationContext;
+        mSocketTimeoutMS = socketTimeoutMS;
+        mHttpTimeoutMS = httpTimeoutMS;
+        mNotifyFinishedBroadcast = notifyFinishedBroadcast;
+    }
+
+    public BaseHTTPCommand(final String url, final int currentPage, final HashMap<String, String> params, RequestType type,
         boolean notifyFinishedBroadcast, String notificationBroadcastIntentID, Context applicationContext,
         int socketTimeoutMS, int httpTimeoutMS, Map<String, String> body) {
         mUrl = url;
+        mCurrentpage = currentPage;
         mBody = body;
 
         if (params != null) {
@@ -128,7 +156,7 @@ public abstract class BaseHTTPCommand<T extends Serializable> implements IAPICom
             // Khởi tạo các cuộc gọi cho Retrofit 2.0
             HNFeedService hnFeedService = retrofit.create(HNFeedService.class);
 
-            Call<List<HNPost>> call = hnFeedService.listHNFeed(0); // hnFeedService.listAllHNFeed();
+            Call<List<HNPost>> call = hnFeedService.getArticles(mCurrentpage, 10);// hnFeedService.listAllHNFeed(); //hnFeedService.listHNFeed(0); //
             // Cuộc gọi bất đồng bọ (chạy dưới background)
             //call.enqueue(getRetrofitResponseHandler());
 
@@ -157,6 +185,9 @@ public abstract class BaseHTTPCommand<T extends Serializable> implements IAPICom
 
         @GET("/api/articlesdemo")
         Call<List<HNPost>> listAllHNFeed();
+
+        @GET("/api/articles/{skip}/{limit}")
+        Call<List<HNPost>> getArticles(@Path("skip") int skip, @Path("limit") int limit);
     }
 
     /**
@@ -255,6 +286,11 @@ public abstract class BaseHTTPCommand<T extends Serializable> implements IAPICom
     @Override
     public List<T> getListResponseContent() {
         return mListResponse;
+    }
+
+    @Override
+    public int getCurrentpage() {
+        return mCurrentpage;
     }
 
     protected void setErrorCode(int errorCode) {

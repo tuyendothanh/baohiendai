@@ -29,6 +29,11 @@ public class HNFeedTaskLoadMore extends HNFeedTaskBase {
         return mFeedToAttachResultsTo.getNextPageURL();
     }
 
+    @Override
+    protected int getCurrentPage() {
+        return mFeedToAttachResultsTo.getNextPage();
+    }
+
     public static void start(Activity activity, ITaskFinishedHandler<HNFeed> finishedHandler,
         HNFeed feedToAttachResultsTo, int taskCode) {
         HNFeedTaskLoadMore task = getInstance(taskCode);

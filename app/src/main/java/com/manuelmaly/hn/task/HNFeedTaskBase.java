@@ -30,13 +30,15 @@ public abstract class HNFeedTaskBase extends BaseTask<HNFeed> {
     
     protected abstract String getFeedURL();
 
+    protected abstract int getCurrentPage();
+
     class HNFeedTaskRunnable extends CancelableRunnable {
 
         StringDownloadCommand mFeedDownload;
 
         @Override
         public void run() {
-            mFeedDownload = new StringDownloadCommand(getFeedURL(), new HashMap<String, String>(), RequestType.GET, false, null,
+            mFeedDownload = new StringDownloadCommand(getFeedURL(), getCurrentPage(), new HashMap<String, String>(), RequestType.GET, false, null,
                 App.getInstance(), HNCredentials.getCookieStore(App.getInstance()));
 
             mFeedDownload.run();
@@ -50,6 +52,8 @@ public abstract class HNFeedTaskBase extends BaseTask<HNFeed> {
                 HNFeedParser feedParser = new HNFeedParser();
                 try {
                     mResult = feedParser.parseHNPost(mFeedDownload.getListResponseContent());
+                    mResult.setNextPageURL(getFeedURL());
+                    mResult.setNextPage(getCurrentPage()+mResult.getPosts().size());
                     Run.inBackground(new Runnable() {
                         public void run() {
                             FileUtil.setLastHNFeed(mResult);

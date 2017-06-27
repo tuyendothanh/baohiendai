@@ -14,6 +14,8 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -30,6 +32,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.manuelmaly.hn.adapter.ArticleAdapter;
 import com.manuelmaly.hn.model.HNFeed;
 import com.manuelmaly.hn.model.HNPost;
 import com.manuelmaly.hn.parser.BaseHTMLParser;
@@ -59,10 +62,10 @@ public class MainListFragment extends BaseListFragment implements
         ITaskFinishedHandler<HNFeed>{
 
     @ViewById(R.id.main_list)
-    ListView mPostsList;
+    RecyclerView mPostsList;
 
-    @ViewById(R.id.main_root)
-    LinearLayout mRootView;
+    //@ViewById(R.id.main_root)
+    //LinearLayout mRootView;
 
     @ViewById(R.id.main_swiperefreshlayout)
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -72,7 +75,7 @@ public class MainListFragment extends BaseListFragment implements
 
     TextView mEmptyListPlaceholder;
     HNFeed mFeed;
-    PostsAdapter mPostsListAdapter;
+    ArticleAdapter mPostsListAdapter;
     Set<HNPost> mUpvotedPosts;
     Set<Integer> mAlreadyRead;
 
@@ -81,6 +84,7 @@ public class MainListFragment extends BaseListFragment implements
     int mFontSizeDetails;
     int mTitleColor;
     int mTitleReadColor;
+    int mCurrentPage;
 
     private static final int TASKCODE_LOAD_FEED = 10;
     private static final int TASKCODE_LOAD_MORE_POSTS = 20;
@@ -124,15 +128,20 @@ public class MainListFragment extends BaseListFragment implements
 
     @AfterViews
     public void init() {
+        mCurrentPage = 0;
         mFeed = new HNFeed(new ArrayList<HNPost>(), null, "");
-        mPostsListAdapter = new PostsAdapter();
+        //mPostsListAdapter = new PostsAdapter();
         mUpvotedPosts = new HashSet<HNPost>();
 
-        mEmptyListPlaceholder = getEmptyTextView(mRootView);
-        mPostsList.setEmptyView(mEmptyListPlaceholder);
+        //mEmptyListPlaceholder = getEmptyTextView(mRootView);
+        //mPostsList.setEmptyView(mEmptyListPlaceholder);
+        //mPostsList.setAdapter(mPostsListAdapter);
+        mPostsListAdapter = new ArticleAdapter(getActivity().getApplicationContext(), mFeed.getPosts());
+        mPostsList.setHasFixedSize(true);
+        mPostsList.setLayoutManager(new GridLayoutManager(getActivity().getApplicationContext(),1));
         mPostsList.setAdapter(mPostsListAdapter);
 
-        mEmptyListPlaceholder.setTypeface(FontHelper.getComfortaa(getActivity(), true));
+        //mEmptyListPlaceholder.setTypeface(FontHelper.getComfortaa(getActivity(), true));
 
         mTitleColor = getResources().getColor(R.color.dark_gray_post_title);
         mTitleReadColor = getResources().getColor(R.color.gray_post_title_read);
@@ -190,6 +199,7 @@ public class MainListFragment extends BaseListFragment implements
         if (taskCode == TASKCODE_LOAD_FEED) {
             if (code.equals(TaskResultCode.Success)
                     && mPostsListAdapter != null) {
+                mCurrentPage = result.getPosts().size();
                 showFeed(result);
             } else
             if (!code.equals(TaskResultCode.Success)) {
@@ -207,6 +217,8 @@ public class MainListFragment extends BaseListFragment implements
             }
 
             mFeed.appendLoadMoreFeed(result);
+            mCurrentPage = mFeed.getPosts().size();
+            mFeed.setNextPage(mCurrentPage);
             mPostsListAdapter.notifyDataSetChanged();
         }
 
@@ -290,7 +302,7 @@ public class MainListFragment extends BaseListFragment implements
 
     private void startFeedLoading() {
         setShowRefreshing(true);
-        HNFeedTaskMainFeed.startOrReattach(this, this, TASKCODE_LOAD_FEED);
+        HNFeedTaskMainFeed.startOrReattach(this, this, TASKCODE_LOAD_FEED, mCurrentPage);
     }
 
     private boolean refreshFontSizes() {

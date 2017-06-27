@@ -13,15 +13,7 @@ public class HNPost implements Serializable {
     String content;
     String desc;
     String title;
-    //String __v;
-    //    private String mURL;
-//    private String mTitle;
-//    private String mAuthor;
-//    private int mCommentsCount;
-//    private int mPoints;
-//    private String mURLDomain;
-//    private String mPostID; // as found in link to comments
-//    private String mUpvoteURL;
+    private boolean readState;
 
     @Override
     public String toString() {
@@ -38,6 +30,14 @@ public class HNPost implements Serializable {
         this.catId = commentsCount;
         this.content = points;
         this.desc = upvoteURL;
+    }
+
+    public boolean getReadState() {
+        return readState;
+    }
+
+    public void setReadState(boolean readState) {
+        this.readState = readState;
     }
 
     public String getURL() {
@@ -74,6 +74,10 @@ public class HNPost implements Serializable {
 
     public String getDesc() {
         return desc;
+    }
+
+    public String getSrc() {
+        return src;
     }
 
     public String getUpvoteURL(String currentUserName) {

@@ -19,8 +19,15 @@ import retrofit2.Callback;
 public class StringDownloadCommand extends BaseHTTPCommand<HNPost> {
 
     public StringDownloadCommand(String url, HashMap<String, String> queryParams, RequestType type, boolean notifyFinishedBroadcast,
-        String notificationBroadcastIntentID, Context applicationContext, CookieStore cookieStore) {
+                                 String notificationBroadcastIntentID, Context applicationContext, CookieStore cookieStore) {
         super(url, queryParams, type, notifyFinishedBroadcast, notificationBroadcastIntentID, applicationContext, 60000, 60000,
+                null);
+        setCookieStore(cookieStore);
+    }
+
+    public StringDownloadCommand(String url, int currentPage, HashMap<String, String> queryParams, RequestType type, boolean notifyFinishedBroadcast,
+        String notificationBroadcastIntentID, Context applicationContext, CookieStore cookieStore) {
+        super(url, currentPage, queryParams, type, notifyFinishedBroadcast, notificationBroadcastIntentID, applicationContext, 60000, 60000,
             null);
         setCookieStore(cookieStore);
     }

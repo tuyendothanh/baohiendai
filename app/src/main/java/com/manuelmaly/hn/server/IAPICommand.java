@@ -39,6 +39,8 @@ public interface IAPICommand<T> extends Runnable {
 
     public List<T> getListResponseContent();
 
+    public int getCurrentpage();
+
     /**
      * Returns the error code which occurred. If a high-level error occurred
      * which has nothing to do with technical issues (e.g. validation error),

@@ -42,6 +42,7 @@ public abstract class BaseTask<T extends Serializable> implements Runnable {
     protected CancelableRunnable mTaskRunnable;
     protected int mTaskCode;
     protected Object mTag;
+    protected int mCurrentPage;
 
     public BaseTask(String notificationBroadcastIntentID, int taskCode) {
         mNotificationBroadcastIntentID = notificationBroadcastIntentID;

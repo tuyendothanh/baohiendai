@@ -10,6 +10,16 @@ public class HNFeed implements Serializable {
     private static final long serialVersionUID = -7957577448455303642L;
     private List<HNPost> mPosts;
     private String mNextPageURL;
+
+    public int getNextPage() {
+        return mNextPage;
+    }
+
+    public void setNextPage(int nextPage) {
+        this.mNextPage = nextPage;
+    }
+
+    private int mNextPage;
     private String mUserAcquiredFor; // this dictates if the upvote URLs are correct
     private boolean mLoadedMore; // currently, we can perform only one "load-more" action reliably
     

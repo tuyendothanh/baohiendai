@@ -10,6 +10,7 @@ public class HNFeedTaskMainFeed extends HNFeedTaskBase {
     
     private static HNFeedTaskMainFeed instance;
     public static final String BROADCAST_INTENT_ID = "HNFeedMain";
+    private static int mCurentPage;
     
     private static HNFeedTaskMainFeed getInstance(int taskCode) {
         synchronized (HNFeedTaskBase.class) {
@@ -25,11 +26,16 @@ public class HNFeedTaskMainFeed extends HNFeedTaskBase {
     
     @Override
     protected String getFeedURL() {
-        return "http://192.168.2.89:3000";
-        //return "http://192.168.1.3:3000";
+        //return "http://192.168.2.89:3000";
+        return "http://192.168.1.11:3000";
         //return "https://news.ycombinator.com/";
     }
-    
+
+    @Override
+    protected int getCurrentPage() {
+        return mCurentPage;
+    }
+
     public static void startOrReattach(Activity activity, ITaskFinishedHandler<HNFeed> finishedHandler, int taskCode) {
         HNFeedTaskMainFeed task = getInstance(taskCode);
         task.setOnFinishedHandler(activity, finishedHandler, HNFeed.class);
@@ -37,8 +43,9 @@ public class HNFeedTaskMainFeed extends HNFeedTaskBase {
             task.startInBackground();
     }
 
-    public static void startOrReattach(Fragment activity, ITaskFinishedHandler<HNFeed> finishedHandler, int taskCode) {
+    public static void startOrReattach(Fragment activity, ITaskFinishedHandler<HNFeed> finishedHandler, int taskCode, int currentPage) {
         HNFeedTaskMainFeed task = getInstance(taskCode);
+        mCurentPage = currentPage;
         task.setOnFinishedHandler(activity, finishedHandler, HNFeed.class);
         if (!task.isRunning())
             task.startInBackground();

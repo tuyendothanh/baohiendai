@@ -78,7 +78,7 @@ public class ArticleReaderActivity extends ActionBarActivity {
             } else {
                 mHtmlProvider = Settings.getHtmlProvider( this );
             }
-            if (mPost.getContent() != null) {
+            if (mPost.getContent() != null && !mPost.getContent().isEmpty()) {
                 showContent(mPost);
                 Resources res = getResources();
                 float fontSize = res.getDimension(R.dimen.txtSize);

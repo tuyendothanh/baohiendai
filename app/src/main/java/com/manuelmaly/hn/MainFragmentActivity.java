@@ -64,19 +64,19 @@ import java.util.Set;
 public class MainFragmentActivity extends BaseListActivity implements
         ITaskFinishedHandler<HNFeed> {
 
-    @ViewById(R.id.main_list)
-    ListView mPostsList;
+    //@ViewById(R.id.main_list)
+    //ListView mPostsList;
 
     @ViewById(R.id.main_root)
     LinearLayout mRootView;
 
-    @ViewById(R.id.main_swiperefreshlayout)
-    SwipeRefreshLayout mSwipeRefreshLayout;
+    //@ViewById(R.id.main_swiperefreshlayout)
+    //SwipeRefreshLayout mSwipeRefreshLayout;
 
     @SystemService
     LayoutInflater mInflater;
 
-    TextView mEmptyListPlaceholder;
+    //TextView mEmptyListPlaceholder;
     HNFeed mFeed;
     PostsAdapter mPostsListAdapter;
     Set<HNPost> mUpvotedPosts;
@@ -134,11 +134,11 @@ public class MainFragmentActivity extends BaseListActivity implements
         mPostsListAdapter = new PostsAdapter();
         mUpvotedPosts = new HashSet<HNPost>();
 
-        mEmptyListPlaceholder = getEmptyTextView(mRootView);
-        mPostsList.setEmptyView(mEmptyListPlaceholder);
-        mPostsList.setAdapter(mPostsListAdapter);
+        //mEmptyListPlaceholder = getEmptyTextView(mRootView);
+        //mPostsList.setEmptyView(mEmptyListPlaceholder);
+        //mPostsList.setAdapter(mPostsListAdapter);
 
-        mEmptyListPlaceholder.setTypeface(FontHelper.getComfortaa(this, true));
+        //mEmptyListPlaceholder.setTypeface(FontHelper.getComfortaa(this, true));
 
         mTitleColor = getResources().getColor(R.color.dark_gray_post_title);
         mTitleReadColor = getResources().getColor(R.color.gray_post_title_read);
@@ -214,12 +214,12 @@ public class MainFragmentActivity extends BaseListActivity implements
 
         toggleSwipeRefreshLayout();
 
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                startFeedLoading();
-            }
-        });
+//        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//            @Override
+//            public void onRefresh() {
+//                startFeedLoading();
+//            }
+//        });
 
         loadAlreadyReadCache();
         loadIntermediateFeedFromStore();
@@ -247,7 +247,7 @@ public class MainFragmentActivity extends BaseListActivity implements
 
         // restore vertical scrolling position if applicable
         if (mListState != null) {
-            mPostsList.onRestoreInstanceState(mListState);
+            //mPostsList.onRestoreInstanceState(mListState);
         }
         mListState = null;
 
@@ -293,7 +293,7 @@ public class MainFragmentActivity extends BaseListActivity implements
     }
 
     private void toggleSwipeRefreshLayout() {
-        mSwipeRefreshLayout.setEnabled(Settings.isPullDownRefresh(MainFragmentActivity.this));
+        //mSwipeRefreshLayout.setEnabled(Settings.isPullDownRefresh(MainFragmentActivity.this));
     }
 
     @Override
@@ -440,7 +440,7 @@ public class MainFragmentActivity extends BaseListActivity implements
     @Override
     protected void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
-        mListState = mPostsList.onSaveInstanceState();
+        //mListState = mPostsList.onSaveInstanceState();
         state.putParcelable(LIST_STATE, mListState);
     }
 
@@ -824,9 +824,9 @@ public class MainFragmentActivity extends BaseListActivity implements
             supportInvalidateOptionsMenu();
         }
 
-        if (mSwipeRefreshLayout.isEnabled() && (!mSwipeRefreshLayout.isRefreshing() || !showRefreshing)) {
-            mSwipeRefreshLayout.setRefreshing(showRefreshing);
-        }
+//        if (mSwipeRefreshLayout.isEnabled() && (!mSwipeRefreshLayout.isRefreshing() || !showRefreshing)) {
+//            mSwipeRefreshLayout.setRefreshing(showRefreshing);
+//        }
     }
 
     static class PostViewHolder {
