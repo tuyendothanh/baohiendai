@@ -1,6 +1,7 @@
 package com.manuelmaly.hn;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -10,11 +11,13 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.DataSetObserver;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.TypedValue;
@@ -66,6 +69,11 @@ public class MainListFragment extends BaseListFragment implements
 
     //@ViewById(R.id.main_root)
     //LinearLayout mRootView;
+    LinearLayoutManager mLayoutManager;
+    private boolean loading = true;
+    int pastVisiblesItems, visibleItemCount, totalItemCount;
+    int visibleThreshold = 5;
+    private int previousTotal = 0;
 
     @ViewById(R.id.main_swiperefreshlayout)
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -84,7 +92,7 @@ public class MainListFragment extends BaseListFragment implements
     int mFontSizeDetails;
     int mTitleColor;
     int mTitleReadColor;
-    int mCurrentPage;
+    //int mCurrentPage;
 
     private static final int TASKCODE_LOAD_FEED = 10;
     private static final int TASKCODE_LOAD_MORE_POSTS = 20;
@@ -128,18 +136,64 @@ public class MainListFragment extends BaseListFragment implements
 
     @AfterViews
     public void init() {
-        mCurrentPage = 0;
+        //mCurrentPage = 0;
         mFeed = new HNFeed(new ArrayList<HNPost>(), null, "");
         //mPostsListAdapter = new PostsAdapter();
         mUpvotedPosts = new HashSet<HNPost>();
 
+        mLayoutManager = new GridLayoutManager(getActivity(),1);
+        //mLayoutManager = new LinearLayoutManager(getActivity());
         //mEmptyListPlaceholder = getEmptyTextView(mRootView);
         //mPostsList.setEmptyView(mEmptyListPlaceholder);
         //mPostsList.setAdapter(mPostsListAdapter);
-        mPostsListAdapter = new ArticleAdapter(getActivity().getApplicationContext(), mFeed.getPosts());
-        mPostsList.setHasFixedSize(true);
-        mPostsList.setLayoutManager(new GridLayoutManager(getActivity().getApplicationContext(),1));
+        mPostsListAdapter = new ArticleAdapter(getActivity().getApplicationContext(), mFeed);
+        mPostsListAdapter.setOnItemClickListener(new ArticleAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position,View shareView) {
+
+                mPostsListAdapter.setReadState(position,true);
+                if (Settings.getHtmlViewer(getActivity()).equals(
+                        getString(R.string.pref_htmlviewer_browser))) {
+                    openURLInBrowser(
+                            getArticleViewURL(mFeed.getPosts().get(position)),
+                            getActivity());
+                } else {
+                    openPostInApp(mFeed.getPosts().get(position), null,
+                            getActivity());
+                }
+            }
+        });
+
+        //mPostsList.setHasFixedSize(true);
+        mPostsList.setLayoutManager(mLayoutManager);
         mPostsList.setAdapter(mPostsListAdapter);
+        mPostsList.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if(dy > 0) {//check for scroll down
+                    visibleItemCount = mLayoutManager.getChildCount();
+                    totalItemCount = mLayoutManager.getItemCount();
+                    pastVisiblesItems = mLayoutManager.findFirstVisibleItemPosition();
+
+                    if (loading) {
+                        if (totalItemCount > previousTotal) {
+                            loading = false;
+                            previousTotal = totalItemCount;
+                        }
+                    }
+                    if (!loading && (totalItemCount - visibleItemCount)
+                            <= (pastVisiblesItems + visibleThreshold)) {
+                        // End has been reached
+                        HNFeedTaskLoadMore.start(getActivity(),
+                                MainListFragment.this, mFeed,
+                                TASKCODE_LOAD_MORE_POSTS);
+                        setShowRefreshing(true);
+
+                        loading = true;
+                    }
+                }
+            }
+        });
 
         //mEmptyListPlaceholder.setTypeface(FontHelper.getComfortaa(getActivity(), true));
 
@@ -151,6 +205,9 @@ public class MainListFragment extends BaseListFragment implements
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                loading = true;
+                previousTotal = 0;
+                mFeed.getPosts().clear();
                 startFeedLoading();
             }
         });
@@ -181,7 +238,7 @@ public class MainListFragment extends BaseListFragment implements
 
         // restore vertical scrolling position if applicable
         if (mListState != null) {
-            mPostsList.onRestoreInstanceState(mListState);
+            mLayoutManager.onRestoreInstanceState(mListState);
         }
         mListState = null;
 
@@ -199,7 +256,7 @@ public class MainListFragment extends BaseListFragment implements
         if (taskCode == TASKCODE_LOAD_FEED) {
             if (code.equals(TaskResultCode.Success)
                     && mPostsListAdapter != null) {
-                mCurrentPage = result.getPosts().size();
+                //mCurrentPage = result.getPosts().size();
                 showFeed(result);
             } else
             if (!code.equals(TaskResultCode.Success)) {
@@ -217,8 +274,8 @@ public class MainListFragment extends BaseListFragment implements
             }
 
             mFeed.appendLoadMoreFeed(result);
-            mCurrentPage = mFeed.getPosts().size();
-            mFeed.setNextPage(mCurrentPage);
+            //mCurrentPage = mFeed.getPosts().size();
+            mFeed.setNextPage(mFeed.getPosts().size());
             mPostsListAdapter.notifyDataSetChanged();
         }
 
@@ -262,7 +319,13 @@ public class MainListFragment extends BaseListFragment implements
     }
 
     private void showFeed(HNFeed feed) {
-        mFeed = feed;
+        mFeed.getPosts().clear();
+        //mFeed.addPosts(feed.getPosts());
+        mFeed.setHNFeed(feed.getPosts(),
+                feed.getNextPageURL(),
+                feed.getNextPage(),
+                feed.getUserAcquiredFor(),
+                feed.isLoadedMore());
         mPostsListAdapter.notifyDataSetChanged();
     }
 
@@ -302,7 +365,7 @@ public class MainListFragment extends BaseListFragment implements
 
     private void startFeedLoading() {
         setShowRefreshing(true);
-        HNFeedTaskMainFeed.startOrReattach(this, this, TASKCODE_LOAD_FEED, mCurrentPage);
+        HNFeedTaskMainFeed.startOrReattach(this, this, TASKCODE_LOAD_FEED, mFeed.getPosts().size());
     }
 
     private boolean refreshFontSizes() {
@@ -342,7 +405,7 @@ public class MainListFragment extends BaseListFragment implements
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
-        mListState = mPostsList.onSaveInstanceState();
+        mListState = mLayoutManager.onSaveInstanceState();
         state.putParcelable(LIST_STATE, mListState);
     }
 

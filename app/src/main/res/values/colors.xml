@@ -17,4 +17,6 @@
 
     <color name="news_unread">#000000</color>
     <color name="news_read">#898989</color>
+
+    <color name="node_bg">#f2f3f5</color>
 </resources>

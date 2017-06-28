@@ -33,6 +33,14 @@ public class HNFeed implements Serializable {
         mUserAcquiredFor = userAcquiredFor;
     }
 
+    public void setHNFeed(List<HNPost> posts, String nextPageURL, int nextPage, String userAcquiredFor, boolean loadedMore) {
+        mPosts = posts;
+        mNextPageURL = nextPageURL;
+        mNextPage = nextPage;
+        mUserAcquiredFor = userAcquiredFor;
+        mLoadedMore = loadedMore;
+    }
+
     public void addPost(HNPost post) {
         mPosts.add(post);
     }
