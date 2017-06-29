@@ -2,22 +2,16 @@ package com.manuelmaly.hn.adapter;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.manuelmaly.hn.R;
 import com.manuelmaly.hn.model.HNFeed;
-import com.manuelmaly.hn.model.HNPost;
 import com.squareup.picasso.Picasso;
-
-import java.util.List;
 
 /**
  * Created by dothanhtuyen on 2017/06/27.
@@ -55,24 +49,28 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+
         if (holder instanceof ArticleViewHolder) {
-            ((ArticleViewHolder)holder).title.setText(mFeed.getPosts().get(position).getTitle());
-            if (mFeed.getPosts().get(position).getReadState()) {
-                ((ArticleViewHolder)holder).title.setTextColor(ContextCompat.getColor(mContext,R.color.news_read));
-            } else {
-                ((ArticleViewHolder)holder).title.setTextColor(ContextCompat.getColor(mContext,R.color.news_unread));
-            }
-            //ImageLoader.load(mContext,mList.get(position).getImages().get(0),((ArticleViewHolder)holder).image);
-            if (!mFeed.getPosts().get(position).getSrc().isEmpty()) {
-                Picasso.with(mContext).load(mFeed.getPosts().get(position).getSrc()).into(((ArticleViewHolder) holder).image);
+            if (position < mFeed.getPosts().size() ) {
+                ((ArticleViewHolder) holder).title.setText(mFeed.getPosts().get(position).getTitle());
+                if (mFeed.getPosts().get(position).getReadState()) {
+                    ((ArticleViewHolder) holder).title.setTextColor(ContextCompat.getColor(mContext, R.color.news_read));
+                } else {
+                    ((ArticleViewHolder) holder).title.setTextColor(ContextCompat.getColor(mContext, R.color.news_unread));
+                }
+                //ImageLoader.load(mContext,mList.get(position).getImages().get(0),((ArticleViewHolder)holder).image);
+                if (!mFeed.getPosts().get(position).getSrc().isEmpty()) {
+                    Picasso.with(mContext).load(mFeed.getPosts().get(position).getSrc()).into(((ArticleViewHolder) holder).image);
+                }
             }
             holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(onItemClickListener != null) {
                     ImageView iv = (ImageView) view.findViewById(R.id.iv_daily_item_image);
-                    final int pos = position;
-                    onItemClickListener.onItemClick(pos,iv);
+                    if (position < mFeed.getPosts().size() ) {
+                        onItemClickListener.onItemClick(position, iv);
+                    }
                 }
             }
             });

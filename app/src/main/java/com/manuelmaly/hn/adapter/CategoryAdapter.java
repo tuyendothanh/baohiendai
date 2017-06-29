@@ -17,8 +17,6 @@ import com.manuelmaly.hn.R;
 import com.manuelmaly.hn.model.CategoryListModel;
 import com.squareup.picasso.Picasso;
 
-import java.util.List;
-
 /**
  * Created by dothanhtuyen on 2017/06/25.
  */
@@ -26,12 +24,12 @@ import java.util.List;
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHolder>{
 
     private Context mContext;
-    private List<CategoryListModel.CategoryData> mList;
+    private CategoryListModel mCategoryListModel;
     private LayoutInflater inflater;
 
-    public CategoryAdapter(Context mContext,List<CategoryListModel.CategoryData> mList) {
+    public CategoryAdapter(Context mContext, CategoryListModel mCategoryListModel) {
         this.mContext = mContext;
-        this.mList = mList;
+        this.mCategoryListModel = mCategoryListModel;
         inflater = LayoutInflater.from(mContext);
     }
 
@@ -66,16 +64,18 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         //lp.height = SystemUtil.dp2px(mContext,120);
 
         //ImageLoader.load(mContext,mList.get(position).getThumbnail(),holder.ivBg);
-        Picasso.with(mContext).load(mList.get(position).getThumbnail()).into(holder.ivBg);
-        holder.tvKind.setText(mList.get(position).getName());
-        holder.tvDes.setText(mList.get(position).getDescription());
+        if (!mCategoryListModel.getData().get(position).getThumbnail().isEmpty()) {
+            Picasso.with(mContext).load(mCategoryListModel.getData().get(position).getThumbnail()).into(holder.ivBg);
+        }
+        holder.tvKind.setText(mCategoryListModel.getData().get(position).getName());
+        holder.tvDes.setText(mCategoryListModel.getData().get(position).getDescription());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent();
                 intent.setClass(mContext, CategoriesFragment.class);
-                intent.putExtra(CategoriesFragment.IT_CATEGORY_ID, mList.get(holder.getAdapterPosition()).getId());
-                intent.putExtra(CategoriesFragment.IT_CATEGORY_TITLE, mList.get(holder.getAdapterPosition()).getName());
+                intent.putExtra(CategoriesFragment.IT_CATEGORY_ID, mCategoryListModel.getData().get(holder.getAdapterPosition()).getId());
+                intent.putExtra(CategoriesFragment.IT_CATEGORY_TITLE, mCategoryListModel.getData().get(holder.getAdapterPosition()).getName());
                 mContext.startActivity(intent);
             }
         });
@@ -83,7 +83,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return mList.size();
+        return mCategoryListModel.getData().size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

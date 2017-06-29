@@ -7,7 +7,7 @@ import java.util.List;
  * Created by dothanhtuyen on 2017/06/25.
  */
 
-public class CategoryListModel {
+public class CategoryListModel implements Serializable {
 
     /**
      * description : Tin tuc kinh doanh

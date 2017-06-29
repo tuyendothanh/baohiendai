@@ -82,7 +82,7 @@ public class ArticleReaderActivity extends ActionBarActivity {
                 showContent(mPost);
                 Resources res = getResources();
                 float fontSize = res.getDimension(R.dimen.txtSize);
-                mWebView.getSettings().setDefaultFontSize((int)fontSize);
+                //mWebView.getSettings().setDefaultFontSize((int)fontSize);
                 fontSize = mWebView.getSettings().getDefaultFontSize();
 
                 //mWebView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
@@ -99,7 +99,7 @@ public class ArticleReaderActivity extends ActionBarActivity {
             }
         }
 
-        mWebView.getSettings().setBuiltInZoomControls( true );
+        mWebView.getSettings().setBuiltInZoomControls( false );
         mWebView.getSettings().setLoadWithOverviewMode( true );
         mWebView.getSettings().setUseWideViewPort( true );
         mWebView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
@@ -115,6 +115,7 @@ public class ArticleReaderActivity extends ActionBarActivity {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                mWebView.getSettings().setDefaultFontSize((int)16);
                 mWebView.loadUrl(getArticleViewURL(mPost, mHtmlProvider, ArticleReaderActivity.this));
             }
         });
@@ -123,9 +124,11 @@ public class ArticleReaderActivity extends ActionBarActivity {
     public void showContent(HNPost hnPost) {
         String htmlData ="<h2>" + hnPost.getTitle() + "</h2>";
         htmlData += "<br>";
+        htmlData += "<p style=\"font-size:20px\">";
         htmlData += "<div>" + hnPost.getDesc() + "</div>";
         htmlData += "<br>";
         htmlData += "<p>" + hnPost.getContent() + "</p>";
+        htmlData += "</p>";
         //mWebView.loadData(htmlData, HtmlUtil.MIME_TYPE, HtmlUtil.ENCODING);
         WebSettings settings = mWebView.getSettings();
         settings.setDefaultTextEncodingName("utf-8");

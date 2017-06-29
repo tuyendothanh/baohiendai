@@ -13,17 +13,17 @@ import java.util.List;
 
 import retrofit2.Callback;
 
-public class StringDownloadCommand<T extends Serializable> extends BaseHTTPCommand<T> {
+public class CategoryDownloadCommand<T extends Serializable> extends CategoryBaseRetrofitCommand<T> {
 
-    public StringDownloadCommand(String url, HashMap<String, String> queryParams, RequestType type, boolean notifyFinishedBroadcast,
-                                 String notificationBroadcastIntentID, Context applicationContext, CookieStore cookieStore) {
+    public CategoryDownloadCommand(String url, HashMap<String, String> queryParams, RequestType type, boolean notifyFinishedBroadcast,
+                                   String notificationBroadcastIntentID, Context applicationContext, CookieStore cookieStore) {
         super(url, queryParams, type, notifyFinishedBroadcast, notificationBroadcastIntentID, applicationContext, 60000, 60000,
                 null);
         setCookieStore(cookieStore);
     }
 
-    public StringDownloadCommand(String url, int currentPage, HashMap<String, String> queryParams, RequestType type, boolean notifyFinishedBroadcast,
-        String notificationBroadcastIntentID, Context applicationContext, CookieStore cookieStore) {
+    public CategoryDownloadCommand(String url, int currentPage, HashMap<String, String> queryParams, RequestType type, boolean notifyFinishedBroadcast,
+                                   String notificationBroadcastIntentID, Context applicationContext, CookieStore cookieStore) {
         super(url, currentPage, queryParams, type, notifyFinishedBroadcast, notificationBroadcastIntentID, applicationContext, 60000, 60000,
             null);
         setCookieStore(cookieStore);

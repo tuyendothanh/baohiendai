@@ -1,9 +1,6 @@
 package com.manuelmaly.hn.server;
 
 import android.content.Context;
-import android.util.Log;
-
-import com.manuelmaly.hn.model.HNPost;
 
 import org.apache.http.client.CookieStore;
 
@@ -33,7 +30,7 @@ public class HNVoteCommand extends NoResponseCommand {
     }
 
     @Override
-    protected Callback<List<HNPost>> getRetrofitResponseHandler() {
+    protected Callback<List<Boolean>> getRetrofitResponseHandler() {
         return null;
     }
 }

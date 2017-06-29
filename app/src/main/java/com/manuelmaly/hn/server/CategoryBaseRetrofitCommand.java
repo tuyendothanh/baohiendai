@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.content.LocalBroadcastManager;
 
-import com.manuelmaly.hn.model.HNPost;
+import com.manuelmaly.hn.model.CategoryListModel;
 
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
@@ -33,7 +33,6 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
-import retrofit2.http.Path;
 
 /**
  * Generic base for HTTP calls via {@link HttpClient}, ideally to be started in
@@ -47,7 +46,7 @@ import retrofit2.http.Path;
  * @param <T>
  *            class of response
  */
-public abstract class BaseHTTPCommand<T extends Serializable> implements IAPICommand<T> {
+public abstract class CategoryBaseRetrofitCommand<T extends Serializable> implements IAPICommand<T> {
 
   private final Map<String, String> mBody;
 
@@ -68,9 +67,9 @@ public abstract class BaseHTTPCommand<T extends Serializable> implements IAPICom
     HttpRequestBase mRequest;
     private CookieStore mCookieStore;
 
-    public BaseHTTPCommand(final String url, final HashMap<String, String> params, RequestType type,
-                           boolean notifyFinishedBroadcast, String notificationBroadcastIntentID, Context applicationContext,
-                           int socketTimeoutMS, int httpTimeoutMS, Map<String, String> body) {
+    public CategoryBaseRetrofitCommand(final String url, final HashMap<String, String> params, RequestType type,
+                                       boolean notifyFinishedBroadcast, String notificationBroadcastIntentID, Context applicationContext,
+                                       int socketTimeoutMS, int httpTimeoutMS, Map<String, String> body) {
         mUrl = url;
         mCurrentpage = 0;
         mBody = body;
@@ -94,9 +93,9 @@ public abstract class BaseHTTPCommand<T extends Serializable> implements IAPICom
         mNotifyFinishedBroadcast = notifyFinishedBroadcast;
     }
 
-    public BaseHTTPCommand(final String url, final int currentPage, final HashMap<String, String> params, RequestType type,
-        boolean notifyFinishedBroadcast, String notificationBroadcastIntentID, Context applicationContext,
-        int socketTimeoutMS, int httpTimeoutMS, Map<String, String> body) {
+    public CategoryBaseRetrofitCommand(final String url, final int currentPage, final HashMap<String, String> params, RequestType type,
+                                       boolean notifyFinishedBroadcast, String notificationBroadcastIntentID, Context applicationContext,
+                                       int socketTimeoutMS, int httpTimeoutMS, Map<String, String> body) {
         mUrl = url;
         mCurrentpage = currentPage;
         mBody = body;
@@ -154,18 +153,18 @@ public abstract class BaseHTTPCommand<T extends Serializable> implements IAPICom
                     .build();
 
             // Khởi tạo các cuộc gọi cho Retrofit 2.0
-            HNFeedService hnFeedService = retrofit.create(HNFeedService.class);
+            CategoryService hnFeedService = retrofit.create(CategoryService.class);
 
-            Call<List<HNPost>> call = hnFeedService.getArticles(mCurrentpage, 10);// hnFeedService.listAllHNFeed(); //hnFeedService.listHNFeed(0); //
+            Call<List<CategoryListModel.CategoryData>> call = hnFeedService.listAllCategory();
             // Cuộc gọi bất đồng bọ (chạy dưới background)
             //call.enqueue(getRetrofitResponseHandler());
 
-            Response<List<HNPost>> newPostResponse = call.execute();
+            Response<List<CategoryListModel.CategoryData>> newPostResponse = call.execute();
 
             // Here call newPostResponse.code() to get response code
             int statusCode = newPostResponse.code();
             if(statusCode == 200) {
-                List<HNPost> newPost = newPostResponse.body();
+                List<CategoryListModel.CategoryData> newPost = newPostResponse.body();
                 responseListHandlingFinished((List<T>) newPost, statusCode);
             }
             else if(statusCode == 401) {
@@ -179,15 +178,9 @@ public abstract class BaseHTTPCommand<T extends Serializable> implements IAPICom
         }
     }
 
-    public interface HNFeedService {
-        @GET("/api/articlesdemo/{index}")
-        Call<List<HNPost>> listHNFeed(@Path("index") int index);
-
-        @GET("/api/articlesdemo")
-        Call<List<HNPost>> listAllHNFeed();
-
-        @GET("/api/articles/{skip}/{limit}")
-        Call<List<HNPost>> getArticles(@Path("skip") int skip, @Path("limit") int limit);
+    public interface CategoryService {
+        @GET("/api/categories")
+        Call<List<CategoryListModel.CategoryData>> listAllCategory();
     }
 
     /**

@@ -4,11 +4,11 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.manuelmaly.hn.App;
+import com.manuelmaly.hn.model.CategoryListModel;
 import com.manuelmaly.hn.model.HNCommentTreeNode;
 import com.manuelmaly.hn.model.HNFeed;
 import com.manuelmaly.hn.model.HNPostComments;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -30,6 +30,13 @@ public class FileUtil {
         }
     }
 
+    public abstract static class GetLastCategoryTask extends AsyncTask<Void, Void, CategoryListModel> {
+        @Override
+        protected CategoryListModel doInBackground(Void... params) {
+            return getLastCategory();
+        }
+    }
+
     /*
      * Returns null if no last feed was found or could not be parsed.
      */
@@ -40,6 +47,27 @@ public class FileUtil {
             Object rawHNFeed = obj.readObject();
             if (rawHNFeed instanceof HNFeed)
                 return (HNFeed) rawHNFeed;
+        } catch (Exception e) {
+            Log.e(TAG, "Could not get last HNFeed from file :(", e);
+        } finally {
+            if (obj != null) {
+                try {
+                    obj.close();
+                } catch (IOException e) {
+                    Log.e(TAG, "Couldn't close last NH feed file :(", e);
+                }
+            }
+        }
+        return null;
+    }
+
+    private static CategoryListModel getLastCategory() {
+        ObjectInputStream obj = null;
+        try {
+            obj = new ObjectInputStream(new FileInputStream(getLastHNFeedFilePath()));
+            Object rawHNFeed = obj.readObject();
+            if (rawHNFeed instanceof CategoryListModel)
+                return (CategoryListModel) rawHNFeed;
         } catch (Exception e) {
             Log.e(TAG, "Could not get last HNFeed from file :(", e);
         } finally {
@@ -76,7 +104,34 @@ public class FileUtil {
         });
     }
 
+    public static void setLastCatelory(final CategoryListModel hnFeed) {
+        Run.inBackground(new Runnable() {
+            public void run() {
+                ObjectOutputStream os = null;
+                try {
+                    os = new ObjectOutputStream(new FileOutputStream(getLastCategoryFilePath()));
+                    os.writeObject(hnFeed);
+                } catch (Exception e) {
+                    Log.e(TAG, "Could not save last Category to file :(", e);
+                } finally {
+                    if (os != null) {
+                        try {
+                            os.close();
+                        } catch (IOException e) {
+                            Log.e(TAG, "Couldn't close last Category file :(", e);
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     private static String getLastHNFeedFilePath() {
+        File dataDir = App.getInstance().getFilesDir();
+        return dataDir.getAbsolutePath() + File.pathSeparator + LAST_HNFEED_FILENAME;
+    }
+
+    private static String getLastCategoryFilePath() {
         File dataDir = App.getInstance().getFilesDir();
         return dataDir.getAbsolutePath() + File.pathSeparator + LAST_HNFEED_FILENAME;
     }

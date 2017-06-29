@@ -1,7 +1,6 @@
 package com.manuelmaly.hn;
 
 import android.app.Activity;
-import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -11,7 +10,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.DataSetObserver;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -31,7 +29,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -207,7 +204,7 @@ public class MainListFragment extends BaseListFragment implements
             public void onRefresh() {
                 loading = true;
                 previousTotal = 0;
-                mFeed.getPosts().clear();
+//                mFeed.getPosts().clear();
                 startFeedLoading();
             }
         });
@@ -238,7 +235,7 @@ public class MainListFragment extends BaseListFragment implements
 
         // restore vertical scrolling position if applicable
         if (mListState != null) {
-            mLayoutManager.onRestoreInstanceState(mListState);
+            mPostsList.getLayoutManager().onRestoreInstanceState(mListState);
         }
         mListState = null;
 
@@ -272,7 +269,8 @@ public class MainListFragment extends BaseListFragment implements
                         Toast.LENGTH_SHORT).show();
                 mFeed.setLoadedMore(true); // reached the end.
             }
-
+            loading = true;
+            previousTotal = 0;
             mFeed.appendLoadMoreFeed(result);
             //mCurrentPage = mFeed.getPosts().size();
             mFeed.setNextPage(mFeed.getPosts().size());
@@ -319,13 +317,18 @@ public class MainListFragment extends BaseListFragment implements
     }
 
     private void showFeed(HNFeed feed) {
+        loading = true;
+        previousTotal = 0;
         mFeed.getPosts().clear();
         //mFeed.addPosts(feed.getPosts());
         mFeed.setHNFeed(feed.getPosts(),
                 feed.getNextPageURL(),
-                feed.getNextPage(),
+                0, // feed.getNextPage()
                 feed.getUserAcquiredFor(),
-                feed.isLoadedMore());
+                true); // feed.isLoadedMore()
+//        if (mListState != null) {
+//            mPostsList.getLayoutManager().onRestoreInstanceState(mListState);
+//        }
         mPostsListAdapter.notifyDataSetChanged();
     }
 
@@ -365,7 +368,7 @@ public class MainListFragment extends BaseListFragment implements
 
     private void startFeedLoading() {
         setShowRefreshing(true);
-        HNFeedTaskMainFeed.startOrReattach(this, this, TASKCODE_LOAD_FEED, mFeed.getPosts().size());
+        HNFeedTaskMainFeed.startOrReattach(this, this, TASKCODE_LOAD_FEED, 0); //mFeed.getPosts().size()
     }
 
     private boolean refreshFontSizes() {
@@ -405,8 +408,10 @@ public class MainListFragment extends BaseListFragment implements
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
-        mListState = mLayoutManager.onSaveInstanceState();
-        state.putParcelable(LIST_STATE, mListState);
+        mListState = mPostsList.getLayoutManager().onSaveInstanceState();
+        if (mListState != null) {
+            state.putParcelable(LIST_STATE, mListState);
+        }
     }
 
     class VoteTaskFinishedHandler implements ITaskFinishedHandler<Boolean> {
