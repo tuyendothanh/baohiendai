@@ -12,6 +12,8 @@ public class App extends Application {
 
     private static App mInstance;
 
+    public static String DOMAIN_URL = "http://192.168.1.11:3000";
+
     @Override
     public void onCreate() {
         super.onCreate();

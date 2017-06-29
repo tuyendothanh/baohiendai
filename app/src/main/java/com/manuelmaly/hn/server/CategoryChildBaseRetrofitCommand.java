@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.content.LocalBroadcastManager;
 
-import com.manuelmaly.hn.model.CategoryListModel;
+import com.manuelmaly.hn.model.HNPost;
 
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
@@ -33,6 +33,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 
 /**
  * Generic base for HTTP calls via {@link HttpClient}, ideally to be started in
@@ -46,7 +47,7 @@ import retrofit2.http.GET;
  * @param <T>
  *            class of response
  */
-public abstract class CategoryBaseRetrofitCommand<T extends Serializable> implements IAPICommand<T> {
+public abstract class CategoryChildBaseRetrofitCommand<T extends Serializable> implements IAPICommand<T> {
 
   private final Map<String, String> mBody;
 
@@ -60,6 +61,7 @@ public abstract class CategoryBaseRetrofitCommand<T extends Serializable> implem
     private T mResponse;
     private List<T> mListResponse;
     private int mCurrentpage;
+    private String mCatId;
     private Object mTag;
     private int mSocketTimeoutMS;
     private int mHttpTimeoutMS;
@@ -67,9 +69,9 @@ public abstract class CategoryBaseRetrofitCommand<T extends Serializable> implem
     HttpRequestBase mRequest;
     private CookieStore mCookieStore;
 
-    public CategoryBaseRetrofitCommand(final String url, final HashMap<String, String> params, RequestType type,
-                                       boolean notifyFinishedBroadcast, String notificationBroadcastIntentID, Context applicationContext,
-                                       int socketTimeoutMS, int httpTimeoutMS, Map<String, String> body) {
+    public CategoryChildBaseRetrofitCommand(final String url, final HashMap<String, String> params, RequestType type,
+                                            boolean notifyFinishedBroadcast, String notificationBroadcastIntentID, Context applicationContext,
+                                            int socketTimeoutMS, int httpTimeoutMS, Map<String, String> body) {
         mUrl = url;
         mCurrentpage = 0;
         mBody = body;
@@ -93,10 +95,11 @@ public abstract class CategoryBaseRetrofitCommand<T extends Serializable> implem
         mNotifyFinishedBroadcast = notifyFinishedBroadcast;
     }
 
-    public CategoryBaseRetrofitCommand(final String url, final int currentPage, final HashMap<String, String> params, RequestType type,
-                                       boolean notifyFinishedBroadcast, String notificationBroadcastIntentID, Context applicationContext,
-                                       int socketTimeoutMS, int httpTimeoutMS, Map<String, String> body) {
+    public CategoryChildBaseRetrofitCommand(final String url,final String catid, final int currentPage, final HashMap<String, String> params, RequestType type,
+                                            boolean notifyFinishedBroadcast, String notificationBroadcastIntentID, Context applicationContext,
+                                            int socketTimeoutMS, int httpTimeoutMS, Map<String, String> body) {
         mUrl = url;
+        mCatId = catid;
         mCurrentpage = currentPage;
         mBody = body;
 
@@ -137,13 +140,13 @@ public abstract class CategoryBaseRetrofitCommand<T extends Serializable> implem
                 return;
             }
 
-//            // Start request, handle response in separate handler:
-//            DefaultHttpClient httpclient = new DefaultHttpClient(getHttpParams());
-//            if (mCookieStore == null)
-//                mCookieStore = new BasicCookieStore();
-//            httpclient.setCookieStore(mCookieStore);
-//            modifyHttpClient(httpclient);
-//            mRequest = createRequest();
+            // Start request, handle response in separate handler:
+            DefaultHttpClient httpclient = new DefaultHttpClient(getHttpParams());
+            if (mCookieStore == null)
+                mCookieStore = new BasicCookieStore();
+            httpclient.setCookieStore(mCookieStore);
+            modifyHttpClient(httpclient);
+            mRequest = createRequest();
 
             // Khởi tạo Retrofit để gán API ENDPOINT (Domain URL) cho Retrofit 2.0
             Retrofit retrofit = new Retrofit.Builder()
@@ -153,18 +156,17 @@ public abstract class CategoryBaseRetrofitCommand<T extends Serializable> implem
                     .build();
 
             // Khởi tạo các cuộc gọi cho Retrofit 2.0
-            CategoryService hnFeedService = retrofit.create(CategoryService.class);
+            CategoryChildService hnFeedService = retrofit.create(CategoryChildService.class);
 
-            Call<List<CategoryListModel.CategoryData>> call = hnFeedService.listAllCategory();
-            // Cuộc gọi bất đồng bọ (chạy dưới background)
+            Call<List<HNPost>> call = hnFeedService.getArticlesInCatId(mCatId, mCurrentpage, 10);
             //call.enqueue(getRetrofitResponseHandler());
 
-            Response<List<CategoryListModel.CategoryData>> newPostResponse = call.execute();
+            Response<List<HNPost>> newPostResponse = call.execute();
 
             // Here call newPostResponse.code() to get response code
             int statusCode = newPostResponse.code();
             if(statusCode == 200) {
-                List<CategoryListModel.CategoryData> newPost = newPostResponse.body();
+                List<HNPost> newPost = newPostResponse.body();
                 responseListHandlingFinished((List<T>) newPost, statusCode);
             }
             else if(statusCode == 401) {
@@ -178,9 +180,12 @@ public abstract class CategoryBaseRetrofitCommand<T extends Serializable> implem
         }
     }
 
-    public interface CategoryService {
-        @GET("/api/categories")
-        Call<List<CategoryListModel.CategoryData>> listAllCategory();
+    public interface CategoryChildService {
+        @GET("/api/articlesincat/{catid}")
+        Call<List<HNPost>> getArticlesInCatId(@Path("catid") String catid);
+
+        @GET("/api/articlesincat/{catid}/{skip}/{limit}")
+        Call<List<HNPost>> getArticlesInCatId(@Path("catid") String catid, @Path("skip") int skip, @Path("limit") int limit);
     }
 
     /**

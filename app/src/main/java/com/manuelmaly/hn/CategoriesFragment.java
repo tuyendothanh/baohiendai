@@ -3,6 +3,7 @@ package com.manuelmaly.hn;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -79,6 +80,15 @@ public class CategoriesFragment extends BaseListFragment implements
         rvSectionList.setLayoutManager(new GridLayoutManager(mContext, 2));
         rvSectionList.setAdapter(mAdapter);
 
+        mAdapter.setOnItemClickListener(new CategoryAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position,View shareView) {
+
+                openCategoryChildActivity(mCategory.getData().get(position),
+                        getActivity());
+            }
+        });
+
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -92,27 +102,12 @@ public class CategoriesFragment extends BaseListFragment implements
         startFeedLoading();
     }
 
-//    public void showContent(CategoryListModel categoryListModel) {
-//        if(swipeRefresh.isRefreshing()) {
-//            swipeRefresh.setRefreshing(false);
-//        }
-//        mList.clear();
-//        mList.addAll(categoryListModel.getData());
-//        mAdapter.notifyDataSetChanged();
-//    }
-//
-//    private CategoryListModel createDmy() {
-//        CategoryListModel categoryListModel = new CategoryListModel();
-//
-//        ArrayList<CategoryListModel.CategoryData> data = new ArrayList<CategoryListModel.CategoryData>();
-//        CategoryListModel.CategoryData categoryData = new CategoryListModel.CategoryData("description", "id", "name", "http://img.f31.vnecdn.net/2017/06/26/TELEMMGLPICT0001330151721largetransNvBQzQNjv4BqwioWl5aH7fAEJ8IWJw2Y5PHkRvugymKLtqq96rVP8-1498434042_140x84.jpeg");
-//        data.add(categoryData);
-//        CategoryListModel.CategoryData categoryData1 = new CategoryListModel.CategoryData("description", "id", "name", "http://img.f32.vnecdn.net/2017/06/23/Hyundai-Sonata-2014-13-3791-1498210628_140x84.jpg");
-//        data.add(categoryData1);
-//        categoryListModel.setData(data);
-//
-//        return categoryListModel;
-//    }
+    public static void openCategoryChildActivity(CategoryListModel.CategoryData post,
+                                                 Activity a) {
+        Intent i = new Intent(a, CategoryChildActivity_.class);
+        i.putExtra(CategoryChildActivity.EXTRA_CATID, post.getName());
+        a.startActivity(i);
+    }
 
     @Override
     public void onResume() {

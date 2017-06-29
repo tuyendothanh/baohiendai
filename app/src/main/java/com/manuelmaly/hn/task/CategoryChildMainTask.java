@@ -7,21 +7,22 @@ import android.support.v4.app.Fragment;
 import com.manuelmaly.hn.App;
 import com.manuelmaly.hn.model.HNFeed;
 
-public class HNFeedTaskMainFeed extends HNFeedTaskBase {
-    
-    private static HNFeedTaskMainFeed instance;
-    public static final String BROADCAST_INTENT_ID = "HNFeedMain";
+public class CategoryChildMainTask extends CategoryChildBaseTask {
+
+    private static CategoryChildMainTask instance;
+    public static final String BROADCAST_INTENT_ID = "CategoryChildMain";
     private static int mCurentPage;
-    
-    private static HNFeedTaskMainFeed getInstance(int taskCode) {
+    private static String mCatId;
+
+    private static CategoryChildMainTask getInstance(int taskCode) {
         synchronized (HNFeedTaskBase.class) {
             if (instance == null)
-                instance = new HNFeedTaskMainFeed(taskCode);
+                instance = new CategoryChildMainTask(taskCode);
         }
         return instance;
     }
-    
-    private HNFeedTaskMainFeed(int taskCode) {
+
+    private CategoryChildMainTask(int taskCode) {
         super(BROADCAST_INTENT_ID, taskCode);
     }
     
@@ -37,23 +38,30 @@ public class HNFeedTaskMainFeed extends HNFeedTaskBase {
         return mCurentPage;
     }
 
+    @Override
+    protected String getCatId() {
+        return mCatId;
+    }
+
     public static void startOrReattach(Activity activity, ITaskFinishedHandler<HNFeed> finishedHandler, int taskCode) {
-        HNFeedTaskMainFeed task = getInstance(taskCode);
+        CategoryChildMainTask task = getInstance(taskCode);
         task.setOnFinishedHandler(activity, finishedHandler, HNFeed.class);
         if (!task.isRunning())
             task.startInBackground();
     }
 
-    public static void startOrReattach(Activity activity, ITaskFinishedHandler<HNFeed> finishedHandler, int taskCode, int currentPage) {
-        HNFeedTaskMainFeed task = getInstance(taskCode);
+    public static void startOrReattach(Activity activity, ITaskFinishedHandler<HNFeed> finishedHandler, int taskCode,
+                                       String catid, int currentPage) {
+        CategoryChildMainTask task = getInstance(taskCode);
         mCurentPage = currentPage;
+        mCatId = catid;
         task.setOnFinishedHandler(activity, finishedHandler, HNFeed.class);
         if (!task.isRunning())
             task.startInBackground();
     }
 
     public static void startOrReattach(Fragment activity, ITaskFinishedHandler<HNFeed> finishedHandler, int taskCode, int currentPage) {
-        HNFeedTaskMainFeed task = getInstance(taskCode);
+        CategoryChildMainTask task = getInstance(taskCode);
         mCurentPage = currentPage;
         task.setOnFinishedHandler(activity, finishedHandler, HNFeed.class);
         if (!task.isRunning())

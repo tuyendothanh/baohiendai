@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 
+import com.manuelmaly.hn.App;
 import com.manuelmaly.hn.model.CategoryListModel;
 
 public class CategoryMainTask extends CategoryBaseTask {
@@ -26,7 +27,7 @@ public class CategoryMainTask extends CategoryBaseTask {
     
     @Override
     protected String getFeedURL() {
-        return "http://192.168.2.89:3000";
+        return App.DOMAIN_URL;//"http://192.168.2.89:3000";
         //return "http://192.168.1.11:3000";
         //return "https://news.ycombinator.com/";
     }

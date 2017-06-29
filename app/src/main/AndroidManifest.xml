@@ -45,6 +45,16 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".CategoryChildActivity_"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:theme="@style/ActionBar.White">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".ArticleReaderActivity_"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false"

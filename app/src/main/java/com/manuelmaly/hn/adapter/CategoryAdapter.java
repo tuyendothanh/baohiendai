@@ -26,6 +26,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
     private Context mContext;
     private CategoryListModel mCategoryListModel;
     private LayoutInflater inflater;
+    private OnItemClickListener onItemClickListener;
 
     public CategoryAdapter(Context mContext, CategoryListModel mCategoryListModel) {
         this.mContext = mContext;
@@ -39,7 +40,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         ViewGroup.LayoutParams lp = holder.ivBg.getLayoutParams();
 
         final float scale = mContext.getResources().getDisplayMetrics().density;
@@ -72,11 +73,12 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent();
-                intent.setClass(mContext, CategoriesFragment.class);
-                intent.putExtra(CategoriesFragment.IT_CATEGORY_ID, mCategoryListModel.getData().get(holder.getAdapterPosition()).getId());
-                intent.putExtra(CategoriesFragment.IT_CATEGORY_TITLE, mCategoryListModel.getData().get(holder.getAdapterPosition()).getName());
-                mContext.startActivity(intent);
+                if(onItemClickListener != null) {
+                    ImageView iv = (ImageView) view.findViewById(R.id.section_bg);
+                    if (position < mCategoryListModel.getData().size() ) {
+                        onItemClickListener.onItemClick(position, iv);
+                    }
+                }
             }
         });
     }
@@ -97,5 +99,13 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
             tvKind = (TextView) itemView.findViewById(R.id.section_kind);
             tvDes = (TextView) itemView.findViewById(R.id.section_des);
         }
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(int position,View view);
     }
 }
