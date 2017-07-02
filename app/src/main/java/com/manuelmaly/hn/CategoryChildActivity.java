@@ -252,6 +252,35 @@ public class CategoryChildActivity extends BaseListActivity implements
         mSwipeRefreshLayout.setEnabled(Settings.isPullDownRefresh(CategoryChildActivity.this));
     }
 
+//    @Override
+//    public boolean onCreateOptionsMenu( Menu menu ) {
+//        getMenuInflater().inflate( R.menu.menu_share_refresh, menu );
+//        return super.onCreateOptionsMenu( menu );
+//    }
+//
+//    @Override
+//    public boolean onPrepareOptionsMenu( Menu menu ) {
+//        MenuItem refreshItem = menu.findItem( R.id.menu_refresh );
+//        MenuItemCompat.setActionView( refreshItem, null );
+//
+//        return super.onPrepareOptionsMenu( menu );
+//    }
+
+    @Override
+    public boolean onOptionsItemSelected( MenuItem item ) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            case R.id.menu_refresh:
+                return true;
+            case R.id.menu_share:
+                return true;
+            default:
+                return super.onOptionsItemSelected( item );
+        }
+    }
+
     @Override
     public void onTaskFinished(int taskCode, TaskResultCode code,
                                HNFeed result, Object tag) {

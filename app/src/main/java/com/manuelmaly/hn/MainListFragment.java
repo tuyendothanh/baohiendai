@@ -269,12 +269,14 @@ public class MainListFragment extends BaseListFragment implements
                         Toast.LENGTH_SHORT).show();
                 mFeed.setLoadedMore(true); // reached the end.
             }
-            loading = true;
-            previousTotal = 0;
-            mFeed.appendLoadMoreFeed(result);
-            //mCurrentPage = mFeed.getPosts().size();
-            mFeed.setNextPage(mFeed.getPosts().size());
-            mPostsListAdapter.notifyDataSetChanged();
+            else {
+                loading = true;
+                previousTotal = 0;
+                mFeed.appendLoadMoreFeed(result);
+                //mCurrentPage = mFeed.getPosts().size();
+                mFeed.setNextPage(mFeed.getPosts().size());
+                mPostsListAdapter.notifyDataSetChanged();
+            }
         }
 
         setShowRefreshing(false);

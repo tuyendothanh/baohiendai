@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -23,6 +24,7 @@ import android.widget.TextView;
 
 import com.manuelmaly.hn.model.HNPost;
 import com.manuelmaly.hn.util.FontHelper;
+import com.manuelmaly.hn.util.HtmlUtil;
 import com.manuelmaly.hn.util.SpotlightActivity;
 import com.manuelmaly.hn.util.ViewedUtils;
 
@@ -30,8 +32,15 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.ViewById;
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
+import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 
 @EActivity(R.layout.article_activity)
 public class ArticleReaderActivity extends ActionBarActivity {
@@ -122,9 +131,9 @@ public class ArticleReaderActivity extends ActionBarActivity {
     }
 
     public void showContent(HNPost hnPost) {
-        String htmlData ="<h2>" + hnPost.getTitle() + "</h2>";
+        String htmlData = "<h2>" + hnPost.getTitle() + "</h2>";
         htmlData += "<br>";
-        htmlData += "<p style=\"font-size:20px\">";
+        //htmlData += "<p style=\"font-size:20px\">";
         htmlData += "<div>" + hnPost.getDesc() + "</div>";
         htmlData += "<br>";
         htmlData += "<p>" + hnPost.getContent() + "</p>";
@@ -133,12 +142,60 @@ public class ArticleReaderActivity extends ActionBarActivity {
         WebSettings settings = mWebView.getSettings();
         settings.setDefaultTextEncodingName("utf-8");
 //        String css = "";//"<link rel=\"stylesheet\" type=\"text/css\" href=\"http://news-at.zhihu.com/css/news_qa.auto.css?v=4b3e3\"/>";
+        final String _html = htmlData;
+
+        final String url = getArticleViewURL(mPost, mHtmlProvider, ArticleReaderActivity.this);
+        mWebView.loadDataWithBaseURL(url, htmlData, "text/html", "utf-8", null);
+        new DownloadCSSTask().execute(url, htmlData);
+
+//        String strCss = "https://s.vnecdn.net/ngoisao/c/v16/ngoisao2016/m_ngoisao.min.css";
 //        ArrayList<String> cssList = new ArrayList<String>();
-//        cssList.add(css);
+//        cssList.add(strCss);
+//        //        cssList.add(css);
 //        ArrayList<String> jsList = new ArrayList<String>();
 //        jsList.add("");
-//        mWebView.loadData(HtmlUtil.createHtmlData(htmlData, cssList, jsList), HtmlUtil.MIME_TYPE, HtmlUtil.ENCODING);
-        mWebView.loadDataWithBaseURL(null, htmlData, "text/html", "utf-8", null);
+        //mWebView.loadData(HtmlUtil.createHtmlData(_html, cssList, jsList), HtmlUtil.MIME_TYPE, HtmlUtil.ENCODING);
+        //mWebView.loadDataWithBaseURL(null, htmlData, "text/html", "utf-8", null);
+    }
+
+    private class DownloadCSSTask extends AsyncTask<String, Void, String> {
+        /** The system calls this to perform work in a worker thread and
+         * delivers it the parameters given to AsyncTask.execute() */
+        protected String doInBackground(String... params) {
+            Document doc;
+            try {
+                //final String url = getArticleViewURL(mPost, mHtmlProvider, ArticleReaderActivity.this);
+                doc = Jsoup.connect(params[0]).get();
+                //Connection connection = Jsoup.connect(url);
+                //doc = connection.get();
+                Elements imports = doc.select("link[href]");
+
+                ArrayList<String> cssList = new ArrayList<String>();
+                for (Element link : imports) {
+                    if (link.attr("rel").equals("stylesheet")) {
+                        cssList.add(link.attr("abs:href"));
+                    }
+                    //print(" * %s <%s> (%s)", link.tagName(),link.attr("abs:href"), link.attr("rel"));
+                }
+
+                //        cssList.add(css);
+                ArrayList<String> jsList = new ArrayList<String>();
+                jsList.add("");
+                return HtmlUtil.createHtmlData(params[1], cssList, jsList);
+                //mWebView.loadDataWithBaseURL(null, HtmlUtil.createHtmlData(_html, cssList, jsList), "text/html", "utf-8", null);
+                //mWebView.loadData(HtmlUtil.createHtmlData(_html, cssList, jsList), HtmlUtil.MIME_TYPE, HtmlUtil.ENCODING);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return params[1];
+        }
+
+        /** The system calls this to perform work in the UI thread and delivers
+         * the result from doInBackground() */
+        protected void onPostExecute(String result) {
+            mWebView.loadDataWithBaseURL(null, result, HtmlUtil.MIME_TYPE, HtmlUtil.ENCODING, null);
+            //mWebView.loadData(HtmlUtil.createHtmlData(_html, cssList, jsList), HtmlUtil.MIME_TYPE, HtmlUtil.ENCODING);
+        }
     }
 
     @Override
