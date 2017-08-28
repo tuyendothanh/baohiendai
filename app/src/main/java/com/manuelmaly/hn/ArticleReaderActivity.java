@@ -89,11 +89,11 @@ public class ArticleReaderActivity extends ActionBarActivity {
             }
             if (mPost.getContent() != null && !mPost.getContent().isEmpty()) {
                 showContent(mPost);
-                Resources res = getResources();
-                float fontSize = res.getDimension(R.dimen.txtSize);
-                //mWebView.getSettings().setDefaultFontSize((int)fontSize);
-                fontSize = mWebView.getSettings().getDefaultFontSize();
-
+//                Resources res = getResources();
+//                //float fontSize = res.getDimension(R.dimen.txtSize);
+//                //mWebView.getSettings().setDefaultFontSize((int)fontSize);
+//                //fontSize = mWebView.getSettings().getDefaultFontSize();
+//
                 //mWebView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
                 mWebView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
                 mWebView.getSettings().setAppCacheEnabled(false);
@@ -110,7 +110,7 @@ public class ArticleReaderActivity extends ActionBarActivity {
 
         mWebView.getSettings().setBuiltInZoomControls( false );
         mWebView.getSettings().setLoadWithOverviewMode( true );
-        mWebView.getSettings().setUseWideViewPort( true );
+        //mWebView.getSettings().setUseWideViewPort( true );
         mWebView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
         mWebView.getSettings().setJavaScriptEnabled( true );
         mWebView.setWebViewClient( new HNReaderWebViewClient() );
@@ -124,13 +124,30 @@ public class ArticleReaderActivity extends ActionBarActivity {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mWebView.getSettings().setDefaultFontSize((int)16);
+                //mWebView.getSettings().setDefaultFontSize((int)16);
                 mWebView.loadUrl(getArticleViewURL(mPost, mHtmlProvider, ArticleReaderActivity.this));
             }
         });
     }
 
     public void showContent(HNPost hnPost) {
+        String strCss = "http://news-at.zhihu.com/css/news_qa.auto.css?v=4b3e3";
+        ArrayList<String> cssList = new ArrayList<String>();
+        cssList.add(strCss);
+        //        cssList.add(css);
+        ArrayList<String> jsList = new ArrayList<String>();
+        jsList.add("");
+        String htmlData = "";
+        //htmlData = "<h2>" + hnPost.getTitle() + "</h2>";
+        //htmlData += "<p>" + hnPost.getDesc() + "</p>";
+        //htmlData += "<p>" + hnPost.getContent() + "</p>";
+        //htmlData = hnPost.getContent();
+        htmlData = HtmlUtil.createHtmlData(hnPost.getContent(), cssList, jsList);
+
+        htmlData = htmlData.replaceAll("\\\"", "\"");
+        mWebView.loadData(htmlData, HtmlUtil.MIME_TYPE, HtmlUtil.ENCODING);
+        return;
+        /*
         String htmlData = "<h2>" + hnPost.getTitle() + "</h2>";
         htmlData += "<br>";
         //htmlData += "<p style=\"font-size:20px\">";
@@ -147,7 +164,7 @@ public class ArticleReaderActivity extends ActionBarActivity {
         final String url = getArticleViewURL(mPost, mHtmlProvider, ArticleReaderActivity.this);
         mWebView.loadDataWithBaseURL(url, htmlData, "text/html", "utf-8", null);
         new DownloadCSSTask().execute(url, htmlData);
-
+*/
 //        String strCss = "https://s.vnecdn.net/ngoisao/c/v16/ngoisao2016/m_ngoisao.min.css";
 //        ArrayList<String> cssList = new ArrayList<String>();
 //        cssList.add(strCss);
